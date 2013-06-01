@@ -1,0 +1,19 @@
+table.metafields { width:100%; margin:0; }
+table.metafields tr th { border:1px solid silver; padding:0.5em 0.3em; }
+table.metafields tr td { border:1px solid silver; padding:0.5em 0.3em; }
+table.metafields tr { background-color:white; color:black; }
+table.metafields tr.required { background-color:lightpink; }
+table.metafields tr.optional { background-color:lightgray; }
+table.metafields tr.editing { background-color:mintcream; }
+table.metafields tr th { color:black; background-color:aliceblue; white-space:nowrap; }
+table.metafields tr th.order { width:2em; }
+table.metafields tr th.name { width:7em; }
+table.metafields tr th.actions { width:8em; }
+table.metafields tr td.order { text-align:right; }
+table.metafields tr td.order input { text-align:right; }
+
+table.metafields label { margin-right:0.2em; }
+table.metafields fieldset { border:1px solid silver; padding:0.5em; margin:0; }
+
+table.metafields div.confirm { color:red; margin-top:0.5em; }
+table.metafields div.warning { color:red; font-weight:bold; margin-top:0.5em; }
