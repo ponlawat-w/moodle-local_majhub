@@ -74,12 +74,27 @@ class point
                 );
             return $this->_cache[$name] = self::get_settings()->pointsforpopularity * count($popularcoursewares);
         case 'quality':
+        //Old code failed when no data, changed but not yet tested Justin 20130617  
+        	$ret = $DB->get_record_sql(
+                'SELECT SUM(b.points) AS pointtotal FROM {majhub_bonus_points} b
+                 JOIN {' . courseware::TABLE . '} cw ON cw.id = b.coursewareid
+                 WHERE cw.userid = :userid AND b.reason = :reason',
+                array('userid' => $this->userid, 'reason' => 'quality')
+                );
+            if(is_object($ret) && is_int($ret->pointtotal)){
+            	return $this->_cache[$name] = $ret->pointtotal;
+            	unset($ret);
+            }else{
+            	return $this->_cache[$name] = 0;
+            }
+        /*
             return $this->_cache[$name] = $DB->count_records_sql(
                 'SELECT SUM(b.points) FROM {majhub_bonus_points} b
                  JOIN {' . courseware::TABLE . '} cw ON cw.id = b.coursewareid
                  WHERE cw.userid = :userid AND b.reason = :reason',
                 array('userid' => $this->userid, 'reason' => 'quality')
                 );
+                */
         case 'download':
             $downloadingcount = $DB->count_records_sql(
                 'SELECT COUNT(d.id) FROM {majhub_courseware_downloads} d
