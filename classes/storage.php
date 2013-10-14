@@ -115,6 +115,32 @@ class storage
             );
         return $this->storage->create_file_from_pathname($filerecord, "$tempdir/$filename");
     }
+    
+    //added Justin to bridge the MAJ Hub and the Plain Hub 20131014
+    //But this is not a solution for the future. We will eventually
+    // just swap out MAJ file logic for Plain Hub logic
+    public function copy_to_storage($coursewareid, $fullpath, $filename){
+    	 global $CFG, $DB;
+
+        // checks if the courseware record exists
+        $courseware = $DB->get_record('majhub_coursewares',
+            array('id' => $coursewareid), '*', MUST_EXIST);
+            
+        // creates a stored file from the filepath
+        $filerecord = array(
+            'contextid'    => $this->context->id,
+            'component'    => self::COMPONENT,
+            'filearea'     => self::FILEAREA,
+            'itemid'       => $courseware->id,
+            'filepath'     => '/',
+            'filename'     => $filename,
+            'mimetype'     => 'application/vnd.moodle.backup',
+            'timecreated'  => time(),
+            'timemodified' => time(),
+            );
+        return $this->storage->create_file_from_pathname($filerecord, $fullpath);
+    
+    }
 
     /**
      *  Deletes partial files

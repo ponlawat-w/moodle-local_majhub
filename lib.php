@@ -2,6 +2,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+
 /**
  *  MAJ Hub cron job
  *  
@@ -105,4 +106,49 @@ function local_majhub_user_created_handler($user)
     } catch (Exception $ex) {
         error_log($ex->__toString());
     }
+}
+
+function local_majhub_hub_course_received_handler($courseinfo)
+{
+
+ 	global $DB,$CFG;
+	
+	require_once __DIR__.'/classes/courseware.php';
+	require_once __DIR__.'/classes/storage.php';
+	
+	//we don't want to have to re store the file
+    //this is only temporary, scaffolding till we re work MAJ hub to use plain hub backup file
+    $storage = new majhub\storage();
+    $courseid = $courseinfo->id;
+     $level1 = floor($courseid / 1000) * 1000;
+     $userdir = "hub/$level1/$courseid";
+     $fullpath = $CFG->dataroot . '/' . $userdir . '/backup_' . $courseid . ".mbz";
+     $filename = 'backup_' . $courseid . '.mbz';
+     $filesize = filesize($fullpath);
+	
+	// checks if the courseware exists
+	//might have to create ...
+    $courseware = $DB->get_record('majhub_coursewares', array('courseid' => $courseinfo->id));
+    if(!$courseware){
+    	$courseware = new stdClass;
+		$courseware->userid       = 1;//$USER->id;
+		$courseware->fullname     = $courseinfo->fullname;
+		$courseware->shortname    = $courseinfo->shortname;
+		$courseware->filesize     = $filesize;
+		$courseware->version      = '1.0';
+		$courseware->timecreated  = time();
+		$courseware->timemodified = $courseware->timecreated;
+		$courseware->id = $DB->insert_record('majhub_coursewares', $courseware);
+    
+    }
+    
+    //finally do the file copy
+	$file =  $storage->copy_to_storage($courseware->id,$fullpath, $filename);
+	
+	//Then tidyup our courseware record
+	$courseware->fileid = $file->get_id();
+	$courseware->timeuploaded = $file->get_timecreated();
+	$courseware->timemodified = $courseware->timeuploaded;
+	$DB->update_record('majhub_coursewares', $courseware);
+
 }

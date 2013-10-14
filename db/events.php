@@ -8,4 +8,12 @@ $handlers = array(
         'handlerfunction' => 'local_majhub_user_created_handler',
         'schedule'        => 'instant',
     ),
+    'hub_course_received' => array(
+        'handlerfile'     => '/local/majhub/lib.php',
+        'handlerfunction' => 'local_majhub_hub_course_received_handler',
+        'schedule'        => 'instant',
+    )
 );
+
+//added hub course received by Justin 20131014
+
