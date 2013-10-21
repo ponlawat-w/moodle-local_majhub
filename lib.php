@@ -22,6 +22,7 @@ function local_majhub_cron()
     $coursewares = $DB->get_records_select(majhub\courseware::TABLE,
         'deleted = 0 AND fileid IS NOT NULL AND courseid IS NULL AND timestarted IS NULL',
         null, 'timeuploaded ASC');
+
     foreach ($coursewares as $courseware) try {
         // double check to prevent from being duplicated
         $courseware = majhub\courseware::from_id($courseware->id, MUST_EXIST);
@@ -68,7 +69,11 @@ function local_majhub_cron()
 
             // enrols all the registered users to the new course as non-editing teachers
             $instanceid = $enroller->add_instance($course);
-            $instance = $DB->get_record('enrol', array('id' => $instanceid), '*', MUST_EXIST);
+            if($instanceid==null){
+            	$instance = $DB->get_record('enrol', array('courseid' => $course->id,'enrol'=>'manual'), '*', MUST_EXIST);
+            }else{
+            	$instance = $DB->get_record('enrol', array('id' => $instanceid), '*', MUST_EXIST);
+            }
             $users = get_users_confirmed();
             foreach ($users as $user) {
                 $enroller->enrol_user($instance, $user->id, $teacherrole->id);
@@ -76,6 +81,12 @@ function local_majhub_cron()
             unset($users); // for memory saving
         }
         mtrace('done.');
+
+        //Add Justin 20131020
+        //make sure the course appears as ready and published. Set privacy to 1 to make it visible.
+        $courseinfo = $DB->get_record('hub_course_directory', array('id' => $courseware->hubcourseid), '*', MUST_EXIST);
+        $courseinfo->privacy = 1;
+        $DB->update_record('hub_course_directory', $courseinfo);  
 
     } catch (Exception $ex) {
         error_log($ex->__toString());
@@ -108,7 +119,7 @@ function local_majhub_user_created_handler($user)
     }
 }
 
-function local_majhub_hub_course_received_handler($courseinfo)
+function local_majhub_hub_course_received_handler($courseid)
 {
 
  	global $DB,$CFG;
@@ -116,39 +127,81 @@ function local_majhub_hub_course_received_handler($courseinfo)
 	require_once __DIR__.'/classes/courseware.php';
 	require_once __DIR__.'/classes/storage.php';
 	
-	//we don't want to have to re store the file
-    //this is only temporary, scaffolding till we re work MAJ hub to use plain hub backup file
-    $storage = new majhub\storage();
-    $courseid = $courseinfo->id;
-     $level1 = floor($courseid / 1000) * 1000;
-     $userdir = "hub/$level1/$courseid";
-     $fullpath = $CFG->dataroot . '/' . $userdir . '/backup_' . $courseid . ".mbz";
-     $filename = 'backup_' . $courseid . '.mbz';
-     $filesize = filesize($fullpath);
+	$storage = new majhub\storage();
+
+		$courseinfo = $DB->get_record('hub_course_directory', array('id' => $courseid), '*', IGNORE_MISSING);
+		
+		//we don't want to have to re store the file
+		//this is only temporary, scaffolding till we re work MAJ hub to use plain hub backup file
+		 $level1 = floor($courseid / 1000) * 1000;
+		 $userdir = "hub/$level1/$courseid";
+		 $fullpath = $CFG->dataroot . '/' . $userdir . '/backup_' . $courseid . ".mbz";
+		 $filename = 'backup_' . $courseid . '.mbz';
+		 $filesize = filesize($fullpath);
+		 
+		 //Get the user to make the owner of this course
+		 $user = $DB->get_record('user', array('email' => $courseinfo->publisheremail));
+		 if($user===false){
+		 	//probably best not to quit if the user is not on the system
+		 	//so we default to the "guest" user
+		 	$userid=1;
+		 }else{
+		 	$userid = $user->id;
+		 }
 	
-	// checks if the courseware exists
-	//might have to create ...
-    $courseware = $DB->get_record('majhub_coursewares', array('courseid' => $courseinfo->id));
-    if(!$courseware){
-    	$courseware = new stdClass;
-		$courseware->userid       = 1;//$USER->id;
-		$courseware->fullname     = $courseinfo->fullname;
-		$courseware->shortname    = $courseinfo->shortname;
-		$courseware->filesize     = $filesize;
-		$courseware->version      = '1.0';
-		$courseware->timecreated  = time();
-		$courseware->timemodified = $courseware->timecreated;
-		$courseware->id = $DB->insert_record('majhub_coursewares', $courseware);
-    
-    }
-    
-    //finally do the file copy
-	$file =  $storage->copy_to_storage($courseware->id,$fullpath, $filename);
+		// checks if the courseware exists
+		//might have to create ...
+		$courseware = $DB->get_record('majhub_coursewares', array('courseid' => $courseinfo->id));
+		if(!$courseware){
+			$courseware = new stdClass;
+			$courseware->userid       = $userid;
+			//must not specify a moodle course id (courseid)!!! 
+			//cron checks for a null before restoring and does that.
+			$courseware->hubcourseid      = $courseinfo->id;
+			$courseware->fullname     = $courseinfo->fullname;
+			$courseware->shortname    = $courseinfo->shortname;
+			$courseware->filesize     = $filesize;
+			$courseware->version      = '1.0';
+			$courseware->timecreated  = time();
+			$courseware->timemodified = $courseware->timecreated;
+			$courseware->id = $DB->insert_record('majhub_coursewares', $courseware);
 	
-	//Then tidyup our courseware record
-	$courseware->fileid = $file->get_id();
-	$courseware->timeuploaded = $file->get_timecreated();
-	$courseware->timemodified = $courseware->timeuploaded;
-	$DB->update_record('majhub_coursewares', $courseware);
+		}
+	
+		//finally do the file copy
+		$file =  $storage->copy_to_storage($courseware->id,$fullpath, $filename);
+	
+		//Then tidyup our courseware record
+		$courseware->fileid = $file->get_id();
+		//$courseware->deleted =0;
+		$courseware->timeuploaded = $file->get_timecreated();
+		$courseware->timemodified = $courseware->timeuploaded;
+		$DB->update_record('majhub_coursewares', $courseware);
+	
+}
+
+function local_majhub_hub_courses_removed_handler($courseids)
+{
+	global $DB,$CFG;
+	
+	require_once __DIR__.'/classes/courseware.php';
+	require_once __DIR__.'/classes/storage.php';
+	
+	$storage = new majhub\storage();
+	foreach($courseids as $courseid){
+
+		$courseware = $DB->get_record('majhub_coursewares', array('hubcourseid' => $courseid));	
+		if(!$courseware){return;}
+		$courseware->deleted= 1;
+		$DB->update_record('majhub_coursewares', $courseware);
+		
+		//if we have a course set its visible to false
+		$course = $DB->get_record('course', array('id' => $courseware->courseid), '*', IGNORE_MISSING);
+		if($course){
+			$course->visible=0;
+			$DB->update_record('course', $course); 
+		}
+		
+	}
 
 }

@@ -128,6 +128,16 @@ function xmldb_local_majhub_upgrade($oldversion = 0)
             }
         }
     }
+    
+     if ($oldversion < 2013101602) {
+        $table = new xmldb_table('majhub_coursewares');
+        $field = new xmldb_field('hubcourseid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'courseid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    }
+    
+    
 
     return true;
 }

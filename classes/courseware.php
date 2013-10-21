@@ -44,6 +44,8 @@ class courseware
     /** @var int|null */
     public $courseid;
     /** @var int|null */
+    public $hubcourseid;
+    /** @var int|null */
     public $previousid;
     /** @var string */
     public $version;
@@ -207,6 +209,7 @@ class courseware
         $courseware->demourl      = isset($record->demourl)    ? trim($record->demourl)   : null;
         $courseware->fileid       = isset($record->fileid)     ? (int)$record->fileid     : null;
         $courseware->courseid     = isset($record->courseid)   ? (int)$record->courseid   : null;
+        $courseware->hubcourseid  = isset($record->hubcourseid)   ? (int)$record->hubcourseid   : null;
         $courseware->previousid   = isset($record->previousid) ? (int)$record->previousid : null;
         $courseware->version      = trim($record->version);
         $courseware->deleted      = (boolean)$record->deleted;

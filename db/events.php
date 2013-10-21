@@ -12,8 +12,14 @@ $handlers = array(
         'handlerfile'     => '/local/majhub/lib.php',
         'handlerfunction' => 'local_majhub_hub_course_received_handler',
         'schedule'        => 'instant',
+    ),
+    'hub_courses_removed' => array(
+        'handlerfile'     => '/local/majhub/lib.php',
+        'handlerfunction' => 'local_majhub_hub_courses_removed_handler',
+        'schedule'        => 'instant',
     )
 );
 
-//added hub course received by Justin 20131014
+//added hub courses received by Justin 20131014
+//added hub courses removed by Justin 20131015
 

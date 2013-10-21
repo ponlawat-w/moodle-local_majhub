@@ -13,8 +13,9 @@
         <FIELD NAME="filesize" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="shortname" NEXT="demourl"/>
         <FIELD NAME="demourl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="filesize" NEXT="fileid"/>
         <FIELD NAME="fileid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="demourl" NEXT="courseid"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="fileid" NEXT="previousid"/>
-        <FIELD NAME="previousid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="version"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="fileid" NEXT="hubcourseid"/>
+        <FIELD NAME="hubcourseid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="previousid"/>
+        <FIELD NAME="previousid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="hubcourseid" NEXT="version"/>
         <FIELD NAME="version" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="previousid" NEXT="deleted"/>
         <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" DEFAULT="0" PREVIOUS="version" NEXT="timecreated"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="deleted" NEXT="timemodified"/>
