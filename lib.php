@@ -149,9 +149,8 @@ function local_majhub_hub_course_received_handler($courseid)
 		 	$userid = $user->id;
 		 }
 	
-		// checks if the courseware exists
-		//might have to create ...
-		$courseware = $DB->get_record('majhub_coursewares', array('courseid' => $courseinfo->id));
+		// checks if the courseware exists, it shouldn't ...
+		$courseware = $DB->get_record('majhub_coursewares', array('hubcourseid' => $courseinfo->id));
 		if(!$courseware){
 			$courseware = new stdClass;
 			$courseware->userid       = $userid;
@@ -160,6 +159,11 @@ function local_majhub_hub_course_received_handler($courseid)
 			$courseware->hubcourseid      = $courseinfo->id;
 			$courseware->fullname     = $courseinfo->fullname;
 			$courseware->shortname    = $courseinfo->shortname;
+			
+			//these are the keys to tying different versions together
+			$courseware->siteid = $courseinfo->siteid;
+			$courseware->sitecourseid = $courseinfo->sitecourseid;
+			
 			$courseware->filesize     = $filesize;
 			$courseware->version      = '1.0';
 			$courseware->timecreated  = time();

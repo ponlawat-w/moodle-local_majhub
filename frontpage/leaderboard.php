@@ -7,22 +7,43 @@ if (false) {
 }
 
 const LEADERBOARD_LIMIT = 5;
-
+/*
 $mostdownloadedcoursewares = $DB->get_records_sql(
     'SELECT cw.*, (SELECT COUNT(*) FROM {majhub_courseware_downloads} d WHERE d.coursewareid = cw.id) AS num_downloads
      FROM {majhub_coursewares} cw JOIN {course} c ON c.id = cw.courseid WHERE cw.deleted = 0
      ORDER BY num_downloads DESC, cw.timeuploaded DESC',
     null, 0, LEADERBOARD_LIMIT);
+    */
+$mostdownloadedcoursewares = $DB->get_records_sql(
+    'SELECT cw.*, (SELECT COUNT(*) FROM {majhub_courseware_downloads} d WHERE d.siteid = cw.siteid AND d.sitecourseid = cw.sitecourseid) AS num_downloads
+     FROM {majhub_coursewares} cw JOIN {course} c ON c.id = cw.courseid WHERE cw.deleted = 0
+     ORDER BY num_downloads DESC, cw.timeuploaded DESC',
+    null, 0, LEADERBOARD_LIMIT);
 
+/*
 $topratedcoursewares = $DB->get_records_sql(
     'SELECT cw.*, (SELECT AVG(r.rating) FROM {majhub_courseware_reviews} r WHERE r.coursewareid = cw.id) AS avg_rating,
                   (SELECT COUNT(*) FROM {majhub_courseware_reviews} r WHERE r.coursewareid = cw.id) AS num_reviews
      FROM {majhub_coursewares} cw JOIN {course} c ON c.id = cw.courseid WHERE cw.deleted = 0
      ORDER BY avg_rating DESC, num_reviews DESC, cw.timeuploaded DESC',
     null, 0, LEADERBOARD_LIMIT);
+    */
+$topratedcoursewares = $DB->get_records_sql(
+    'SELECT cw.*, (SELECT AVG(r.rating) FROM {majhub_courseware_reviews} r WHERE r.siteid = cw.siteid AND r.sitecourseid = cw.sitecourseid) AS avg_rating,
+                  (SELECT COUNT(*) FROM {majhub_courseware_reviews} r WHERE r.coursewareid = cw.id) AS num_reviews
+     FROM {majhub_coursewares} cw JOIN {course} c ON c.id = cw.courseid WHERE cw.deleted = 0
+     ORDER BY avg_rating DESC, num_reviews DESC, cw.timeuploaded DESC',
+    null, 0, LEADERBOARD_LIMIT);
 
+/*
 $mostreviewedcoursewares = $DB->get_records_sql(
     'SELECT cw.*, (SELECT COUNT(*) FROM {majhub_courseware_reviews} r WHERE r.coursewareid = c.id) AS num_reviews
+     FROM {majhub_coursewares} cw JOIN {course} c ON c.id = cw.courseid WHERE cw.deleted = 0
+     ORDER BY num_reviews DESC, cw.timeuploaded DESC',
+    null, 0, LEADERBOARD_LIMIT);
+    */
+$mostreviewedcoursewares = $DB->get_records_sql(
+    'SELECT cw.*, (SELECT COUNT(*) FROM {majhub_courseware_reviews} r WHERE r.siteid = cw.siteid AND r.sitecourseid = cw.sitecourseid) AS num_reviews
      FROM {majhub_coursewares} cw JOIN {course} c ON c.id = cw.courseid WHERE cw.deleted = 0
      ORDER BY num_reviews DESC, cw.timeuploaded DESC',
     null, 0, LEADERBOARD_LIMIT);

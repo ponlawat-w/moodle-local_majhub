@@ -129,12 +129,65 @@ function xmldb_local_majhub_upgrade($oldversion = 0)
         }
     }
     
-     if ($oldversion < 2013101602) {
+    if ($oldversion < 2013101602) {
         $table = new xmldb_table('majhub_coursewares');
         $field = new xmldb_field('hubcourseid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'courseid');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+    }
+    
+     if ($oldversion < 2013102200) {
+        $table = new xmldb_table('majhub_coursewares');
+        //add siteid
+        $field = new xmldb_field('siteid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'courseid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        //add sitecourseid
+        $field = new xmldb_field('sitecourseid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'siteid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $DB->execute(
+        		'UPDATE {majhub_coursewares} cw, {hub_course_directory} hcd 
+        		SET cw.siteid = hcd.siteid, cw.sitecourseid = hcd.sitecourseid 
+        		WHERE cw.courseid = hcd.id'
+        		);
+    }
+    
+     if ($oldversion < 2013102700) {
+     	//add siteid and sitecourseid to downloads table
+        $table = new xmldb_table('majhub_courseware_downloads');
+        $field = new xmldb_field('siteid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'coursewareid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('sitecourseid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'siteid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+         $DB->execute(
+        		'UPDATE {majhub_courseware_downloads} d, {majhub_coursewares} cw 
+        		SET d.siteid = cw.siteid, d.sitecourseid = cw.sitecourseid 
+        		WHERE d.coursewareid = cw.id'
+        		);
+        
+        //add siteid and sitecourseid to reviews table
+        $table = new xmldb_table('majhub_courseware_reviews');
+        $field = new xmldb_field('siteid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'coursewareid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('sitecourseid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'siteid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $DB->execute(
+        		'UPDATE {majhub_courseware_reviews} r, {majhub_coursewares} cw 
+        		SET r.siteid = cw.siteid, r.sitecourseid = cw.sitecourseid 
+        		WHERE r.coursewareid = cw.id'
+        		);
     }
     
     
