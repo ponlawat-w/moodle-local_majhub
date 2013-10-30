@@ -149,11 +149,33 @@ function xmldb_local_majhub_upgrade($oldversion = 0)
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+        
+        //set sitecourseid to the correct value, or to a default value that will retain stats. 
+        //will require manual fixing up of siteid/sitecourseid if going from hubclient to new publish method 
         $DB->execute(
         		'UPDATE {majhub_coursewares} cw, {hub_course_directory} hcd 
         		SET cw.siteid = hcd.siteid, cw.sitecourseid = hcd.sitecourseid 
-        		WHERE cw.courseid = hcd.id'
+        		WHERE cw.hubcourseid = hcd.id'
         		);
+        
+        $DB->execute(
+        		'UPDATE {majhub_coursewares} cw 
+        		SET cw.sitecourseid = cw.courseid 
+        		WHERE cw.sitecourseid = 0 AND cw.siteid = 0'
+        		);
+        		
+        		
+        $DB->execute(
+        		'UPDATE {majhub_courseware_downloads} cwd, {majhub_coursewares} cw   
+				SET cwd.sitecourseid = cw.courseid 
+				WHERE cwd.sitecourseid = 0 AND cwd.siteid = 0 AND cw.id = cwd.coursewareid'
+				);
+
+		$DB->execute(
+        		'UPDATE {majhub_courseware_reviews} cwr , {majhub_coursewares} cw 
+				SET cwr.sitecourseid = cw.courseid 
+				WHERE cwr.sitecourseid = 0 AND cwr.siteid = 0 AND cw.id = cwr.coursewareid'
+				);
     }
     
      if ($oldversion < 2013102700) {

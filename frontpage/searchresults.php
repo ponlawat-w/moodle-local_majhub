@@ -11,6 +11,7 @@ use majhub\criterion;
 use majhub\metafield;
 use majhub\extension;
 use majhub\setting;
+use majhub\point;
 
 if (false) {
     $DB     = new mysqli_native_moodle_database;
@@ -176,10 +177,33 @@ if ($defaultlimit > 0) {
                 html_writer::link($previewurl, $previewicon . $strpreview, array('title' => $strpreviewtip)),
                 array('style' => $buttonstyle)
                 );
+                
+		//download Justin 20131030 The old download link had different behaviour to the link the courseware block
+    	$paid = $DB->record_exists('majhub_courseware_downloads',
+            array('userid' => $USER->id, 'coursewareid' => $courseware->id));
+        $userpoint = majhub\point::from_userid($USER->id);
+        $downloadcost = majhub\point::get_settings()->pointsfordownloading;
+        if ($paid) {
             echo html_writer::tag('div',
                 html_writer::link($downloadurl, $downloadicon . $strdownload, array('title' => $strdownloadtip)),
                 array('style' => $buttonstyle)
                 );
+        } elseif ($userpoint->total >= $downloadcost) {
+            $confirmpurchase = new confirm_action(get_string('confirm:payfordownload', 'local_majhub', $downloadcost));
+            echo html_writer::tag('div', 
+            	$OUTPUT->action_link($downloadurl, $downloadicon . $strdownload, $confirmpurchase, array('title' => $strdownloadtip)),
+            	 array('style' => $buttonstyle)
+            	 );
+        } else {
+            echo html_writer::tag('div', $strdownload, array('style' => $buttonstyle . ' color:silver;', 'title' => get_string('error:youdonthaveenoughpoints', 'local_majhub')));
+        }
+			  /*  
+            echo html_writer::tag('div',
+                html_writer::link($downloadurl, $downloadicon . $strdownload, array('title' => $strdownloadtip)),
+                array('style' => $buttonstyle)
+                );
+                */
+                
             if (empty($courseware->demourl)) {
                 echo html_writer::tag('div', $strdemosite, array('style' => $buttonstyle . ' color:silver;'));
             } else {
