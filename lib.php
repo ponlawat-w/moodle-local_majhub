@@ -187,6 +187,7 @@ function local_majhub_hub_course_received_handler($courseid)
 			$courseware->hubcourseid      = $courseinfo->id;
 			$courseware->fullname     = $courseinfo->fullname;
 			$courseware->shortname    = $courseinfo->shortname;
+			$courseware->demourl    = $courseinfo->demourl;
 			
 			//these are the keys to tying different versions together
 			$courseware->siteid = $courseinfo->siteid;

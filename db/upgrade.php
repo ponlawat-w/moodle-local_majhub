@@ -240,6 +240,25 @@ function xmldb_local_majhub_upgrade($oldversion = 0)
 */
 	 
 	 }
+	 
+	 if ($oldversion < 2013110500) {
+		 $table = new xmldb_table('majhub_bonus_points');
+		//add siteid and sitecourseid
+		$field = new xmldb_field('siteid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'coursewareid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('sitecourseid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'siteid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $DB->execute(
+        		'UPDATE {majhub_bonus_points} bp, {majhub_coursewares} cw 
+        		SET bp.siteid = cw.siteid, bp.sitecourseid = cw.sitecourseid 
+        		WHERE bp.coursewareid = cw.id'
+        		);
+	 
+	 }
 
     
     

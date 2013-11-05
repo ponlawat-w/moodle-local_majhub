@@ -72,15 +72,19 @@ class point
                  GROUP BY cw.id HAVING COUNT(d.id) >= :countforpopularity',
                 array('userid' => $this->userid, 'countforpopularity' => self::get_settings()->countforpopularity)
                 );
+         
             return $this->_cache[$name] = self::get_settings()->pointsforpopularity * count($popularcoursewares);
+       
         case 'quality':
-        //Old code failed when no data, changed but not yet tested Justin 20130617  
+        
         	$ret = $DB->get_record_sql(
                 'SELECT SUM(b.points) AS pointtotal FROM {majhub_bonus_points} b
                  JOIN {' . courseware::TABLE . '} cw ON cw.id = b.coursewareid
                  WHERE cw.userid = :userid AND b.reason = :reason',
                 array('userid' => $this->userid, 'reason' => 'quality')
                 );
+            
+     
             if(is_object($ret) && is_numeric($ret->pointtotal) && $ret->pointtotal > 0 ){
             	return $this->_cache[$name] = $ret->pointtotal;
             	unset($ret);
@@ -96,12 +100,13 @@ class point
                 );
                 */
         case 'download':
-            $downloadingcount = $DB->count_records_sql(
+        $downloadingcount = $DB->count_records_sql(
                 'SELECT COUNT(d.id) FROM {majhub_courseware_downloads} d
                  JOIN {' . courseware::TABLE . '} cw ON cw.id = d.coursewareid
                  WHERE d.userid = :userid AND cw.userid <> d.userid',
                 array('userid' => $this->userid)
                 );
+       
             return $this->_cache[$name] = self::get_settings()->pointsfordownloading * $downloadingcount;
         case 'total':
             return $this->registration
