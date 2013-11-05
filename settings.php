@@ -14,6 +14,9 @@ if (empty($CFG->customfrontpageinclude) || realpath($CFG->customfrontpageinclude
     $ADMIN->add('majhub', new admin_externalpage('majhub/install',
         'INSTALL', new moodle_url('/local/majhub/INSTALL.txt')));
 } else {
+	$ADMIN->add('majhub', new admin_externalpage('majhub/restore',
+        new lang_string('settings/restore', 'local_majhub'),
+        new moodle_url('/local/majhub/admin/restoresettings.php')));
     $ADMIN->add('majhub', new admin_externalpage('majhub/frontpage',
         new lang_string('settings/frontpage', 'local_majhub'),
         new moodle_url('/local/majhub/admin/frontpage.php')));

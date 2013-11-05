@@ -81,7 +81,7 @@ class point
                  WHERE cw.userid = :userid AND b.reason = :reason',
                 array('userid' => $this->userid, 'reason' => 'quality')
                 );
-            if(is_object($ret) && is_int($ret->pointtotal)){
+            if(is_object($ret) && is_numeric($ret->pointtotal) && $ret->pointtotal > 0 ){
             	return $this->_cache[$name] = $ret->pointtotal;
             	unset($ret);
             }else{

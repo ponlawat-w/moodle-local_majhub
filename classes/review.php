@@ -25,6 +25,11 @@ class review
     public $userid;
     /** @var int */
     public $coursewareid;
+	/** @var int */
+	public $siteid;
+	/** @var int */
+	public $sitecourseid;
+	
     /** @var int */
     public $rating;
     /** @var string */
@@ -80,6 +85,8 @@ class review
         $review->id           = (int)$record->id;
         $review->userid       = (int)$record->userid;
         $review->coursewareid = (int)$record->coursewareid;
+		$review->siteid = (int)$record->siteid;
+		$review->sitecourseid = (int)$record->sitecourseid;
         $review->rating       = (int)$record->rating;
         $review->comment      = trim($record->comment);
         $review->timecreated  = (int)$record->timecreated;

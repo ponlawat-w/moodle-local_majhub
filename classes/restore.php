@@ -8,6 +8,7 @@
 namespace majhub;
 
 require_once __DIR__.'/scoped.php';
+require_once __DIR__.'/setting.php';
 
 /**
  *  Restores a courseware as a new course
@@ -52,11 +53,53 @@ function restore($coursewareid)
     $file = $fs->get_file_by_id($courseware->fileid);
     $file->copy_content_to("$workdir/$tempzip");
     $tempfiles[] = "$workdir/$tempzip";
+	
 
     // extracts the archive in the working directory
     $packer = new \zip_packer();
     $packer->extract_to_pathname("$workdir/$tempzip", "$workdir/$tempdir");
     $tempfiles[] = "$workdir/$tempdir";
+
+	//get backup file version and release strings from zip moodle_backup.xml
+	$restorable = true;
+	$backupversion = "unknown";
+	$backuprelease="unknown";
+	$infofilepath = "$workdir/$tempdir" . "/moodle_backup.xml";
+	if(file_exists($infofilepath)){
+		$infofile = file_get_contents($infofilepath);
+		//get backupversion
+		$in = strpos($infofile,'<backup_version>');
+		if($in){
+				$in = $in + strlen('<backup_version>');
+		}
+		$out = strpos($infofile,'</backup_version>');
+		if($in && $out){
+			$backupversion=substr($infofile,$in, $out-$in);
+			if(setting::get('minrestorableversion') > intval($backupversion)){
+				$restorable = false;
+			}
+			//get backuprelease
+			$in = strpos($infofile,'<backup_release>');
+			if($in){
+				$in = $in + strlen('<backup_release>');
+			}
+			$out = strpos($infofile,'</backup_release>');
+			if($in && $out){
+				$backuprelease=substr($infofile,$in, $out-$in);
+			}
+		}
+	}
+	
+	//cancel restoration. Version too old
+	if(!$restorable){
+		// updates the courseware record
+		$courseware->backupversion = $backupversion;
+		$courseware->backuprelease = $backuprelease;
+		$courseware->unrestorable = true;
+		$courseware->timemodified = time();
+		$DB->update_record('majhub_coursewares', $courseware);
+		return false;
+	}
 
     // restores the backup as a new course in the fist top-level category
     $categories = $DB->get_records('course_categories', array('parent' => 0), 'id ASC', '*', 0, 1);
@@ -75,6 +118,8 @@ function restore($coursewareid)
 
     // updates the courseware record
     $courseware->courseid = $courseid;
+	$courseware->backupversion = $backupversion;
+	$courseware->backuprelease = $backuprelease;
     $courseware->timerestored = time();
     $courseware->timemodified = $courseware->timerestored;
     $DB->update_record('majhub_coursewares', $courseware);

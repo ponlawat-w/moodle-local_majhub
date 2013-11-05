@@ -6,6 +6,7 @@ require_once __DIR__.'/../classes/criterion.php';
 require_once __DIR__.'/../classes/metafield.php';
 require_once __DIR__.'/../classes/extension.php';
 require_once __DIR__.'/../classes/setting.php';
+require_once __DIR__.'/../classes/point.php';
 
 use majhub\criterion;
 use majhub\metafield;
@@ -79,7 +80,8 @@ if ($defaultlimit > 0) {
     }
     $criterion = criterion::join('AND', $criteria);
 
-    $sql = 'SELECT cw.id, cw.fullname, cw.courseid, cw.demourl, cw.timeuploaded, u.firstname, u.lastname,
+    $sql = 'SELECT cw.id, cw.fullname, cw.courseid, cw.demourl, cw.backuprelease, cw.backupversion, cw.unrestorable, 
+			cw.timeuploaded, u.firstname, u.lastname,
                    (SELECT AVG(r.rating) FROM {majhub_courseware_reviews} r WHERE r.coursewareid = cw.id) AS rating,
                    (SELECT COUNT(*) FROM {majhub_courseware_reviews} r WHERE r.coursewareid = cw.id) AS num_reviews
             FROM {majhub_coursewares} cw
@@ -173,10 +175,14 @@ if ($defaultlimit > 0) {
                     echo html_writer::tag('div', $info, array('style' => $infostyle));
                 }
             }
-            echo html_writer::tag('div',
-                html_writer::link($previewurl, $previewicon . $strpreview, array('title' => $strpreviewtip)),
-                array('style' => $buttonstyle)
-                );
+			if($courseware->unrestorable){
+				echo html_writer::tag('div', $strpreview, array('style' => $buttonstyle . ' color:silver;', 'title' => get_string('error:coursecannotbepreviewed', 'local_majhub')));
+			}else{
+				echo html_writer::tag('div',
+					html_writer::link($previewurl, $previewicon . $strpreview, array('title' => $strpreviewtip)),
+					array('style' => $buttonstyle)
+					);
+			}
                 
 		//download Justin 20131030 The old download link had different behaviour to the link the courseware block
     	$paid = $DB->record_exists('majhub_courseware_downloads',
@@ -219,6 +225,8 @@ if ($defaultlimit > 0) {
             echo html_writer::tag('h4', $courseware->fullname, array('class' => 'sectionname'));
             echo html_writer::start_tag('div', array('style' => 'margin:2px 0 0 10px; color:gray;'));
             echo html_writer::tag('span', get_string('contributor', 'local_majhub') . ': ' . fullname($courseware));
+			echo html_writer::tag('span', get_string('moodleversion', 'local_majhub') . ': ' . $courseware->backuprelease,
+					array('style' => 'margin:2px 0 0 10px; color:gray;'));
             // TODO: show more details
             echo html_writer::end_tag('div');
             echo html_writer::end_tag('div');

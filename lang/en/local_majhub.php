@@ -67,6 +67,7 @@ $string['give'] = 'Give';
 $string['settings/frontpage'] = 'Front page settings';
 $string['settings/metafields'] = 'Meta field definitions';
 $string['settings/pointsystem'] = 'Point system settings';
+$string['settings/restore'] = 'Course restore settings';
 
 $string['coursewaresperpageoptions'] = 'Choices for coursewares per page';
 $string['coursewaresperpagedefault'] = 'Default coursewares per page';
@@ -103,8 +104,12 @@ $string['error:accessdenied'] = 'Access denied
 (If you have multiple accounts on this Hub server, log in as the account you entered in your Hub Client.)';
 $string['error:missingcourseware'] = 'Courseware #{$a} is missing';
 $string['error:youdonthaveenoughpoints'] = 'Sorry, you don\'t have enough points.';
-
+$string['error:coursecannotbepreviewed'] = 'This course is not available for preview.';
 $string['error:metafield:emptyname'] = 'Name cannot be empty';
 $stirng['error:metafield:emptyoptions'] = 'Options cannot be empty if type is not Text';
 $string['error:metafield:duplicatename'] = 'Name is already in use';
 $string['error:metafield:duplicateoption'] = 'Duplicate option cannot be set';
+
+$string['maxrestorablebackupsize'] ='Maximum backup file size for restoration';
+$string['minrestorableversion'] ='Minimum required Moodle version';
+$string['moodleversion'] ='Moodle version';

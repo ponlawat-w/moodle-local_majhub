@@ -140,7 +140,7 @@ function xmldb_local_majhub_upgrade($oldversion = 0)
      if ($oldversion < 2013102200) {
         $table = new xmldb_table('majhub_coursewares');
         //add siteid
-        $field = new xmldb_field('siteid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'courseid');
+        $field = new xmldb_field('siteid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'hubcourseid');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -211,6 +211,36 @@ function xmldb_local_majhub_upgrade($oldversion = 0)
         		WHERE r.coursewareid = cw.id'
         		);
     }
+	
+	 if ($oldversion < 2013110400) {
+		 $table = new xmldb_table('majhub_coursewares');
+		//add backupversion
+		$field = new xmldb_field('backupversion', XMLDB_TYPE_CHAR, 20, null, null, null, 'unknown','sitecourseid');
+		if (!$dbman->field_exists($table, $field)) {
+			$dbman->add_field($table, $field);
+		}
+
+		//add backup_release
+		$field = new xmldb_field('backuprelease', XMLDB_TYPE_CHAR, 50, null, null, null, 'unknown','backupversion');
+		if (!$dbman->field_exists($table, $field)) {
+			$dbman->add_field($table, $field);
+		}
+		
+		//add backup_release
+		$field = new xmldb_field('unrestorable', XMLDB_TYPE_INTEGER, 1, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0,'backuprelease');
+		if (!$dbman->field_exists($table, $field)) {
+			$dbman->add_field($table, $field);
+		}
+/*
+		$DB->execute(
+        		'UPDATE {hub_site_directory} hsd, {majhub_coursewares} cw 
+        		SET cw.backupversion = hsd.moodleversion, cw.backuprelease = hsd.backuprelease 
+        		WHERE cw.siteid = hsd.id'
+        		);
+*/
+	 
+	 }
+
     
     
 

@@ -15,7 +15,9 @@ function local_majhub_cron()
     require_once __DIR__.'/classes/restore.php';
     require_once __DIR__.'/classes/courseware.php';
 
+
     $teacherrole = $DB->get_record('role', array('archetype' => 'teacher'), '*', IGNORE_MULTIPLE);
+    $editingteacherrole = $DB->get_record('role', array('archetype' => 'editingteacher'), '*', IGNORE_MULTIPLE);
     $enroller = enrol_get_plugin('manual');
 
     // gets all uploaded, not restored and not restoring coursewares
@@ -24,10 +26,12 @@ function local_majhub_cron()
         null, 'timeuploaded ASC');
 
     foreach ($coursewares as $courseware) try {
-        // double check to prevent from being duplicated
+	    // double check to prevent from being duplicated
         $courseware = majhub\courseware::from_id($courseware->id, MUST_EXIST);
-        if (!empty($courseware->courseid) || !empty($courseware->timestarted))
-            continue;
+        
+        if (!empty($courseware->courseid) || !empty($courseware->timestarted) || $courseware->unrestorable)
+            continue;	
+			
         // marks as restoring
         $DB->set_field(majhub\courseware::TABLE, 'timestarted', time(), array('id' => $courseware->id));
 
@@ -35,8 +39,14 @@ function local_majhub_cron()
 
         mtrace('    Creating a preview course', '...');
         {
+
             // restores the uploaded course backup file as a new course
-            $courseware->courseid = majhub\restore($courseware->id);
+			$courseid = majhub\restore($courseware->id);
+			
+			// if restoration did not happen, exit
+			if($courseid === false){continue;}
+			
+            $courseware->courseid = $courseid;
             $course = $DB->get_record('course', array('id' => $courseware->courseid), '*', MUST_EXIST);
 
             // deletes old coursewares having same courseid
@@ -76,7 +86,12 @@ function local_majhub_cron()
             }
             $users = get_users_confirmed();
             foreach ($users as $user) {
-                $enroller->enrol_user($instance, $user->id, $teacherrole->id);
+            	//add justin, make the owner an editing teacher
+            	if($user->id == $courseware->userid && $courseware->userid > 1){
+            		$enroller->enrol_user($instance, $user->id, $editingteacherrole->id);
+            	}else{
+                	$enroller->enrol_user($instance, $user->id, $teacherrole->id);
+                }
             }
             unset($users); // for memory saving
         }
@@ -87,10 +102,11 @@ function local_majhub_cron()
         $courseinfo = $DB->get_record('hub_course_directory', array('id' => $courseware->hubcourseid), '*', MUST_EXIST);
         $courseinfo->privacy = 1;
         $DB->update_record('hub_course_directory', $courseinfo);  
-
-    } catch (Exception $ex) {
+    
+	} catch (Exception $ex) {
         error_log($ex->__toString());
     }
+	
 }
 
 /**
@@ -115,7 +131,9 @@ function local_majhub_user_created_handler($user)
             array('enrol' => $enroller->get_name(), 'courseid' => $courseware->courseid), '*', MUST_EXIST);
         $enroller->enrol_user($instance, $user->id, $teacherrole->id);
     } catch (Exception $ex) {
-        error_log($ex->__toString());
+        //don't really need this error
+		//if we have a courseware with no courseid (ie not restored) then it will fire this
+		//error_log($ex->__toString());
     }
 }
 
@@ -126,6 +144,9 @@ function local_majhub_hub_course_received_handler($courseid)
 	
 	require_once __DIR__.'/classes/courseware.php';
 	require_once __DIR__.'/classes/storage.php';
+	require_once __DIR__.'/classes/setting.php';
+
+	//use majhub\setting;
 	
 	$storage = new majhub\storage();
 
@@ -138,6 +159,13 @@ function local_majhub_hub_course_received_handler($courseid)
 		 $fullpath = $CFG->dataroot . '/' . $userdir . '/backup_' . $courseid . ".mbz";
 		 $filename = 'backup_' . $courseid . '.mbz';
 		 $filesize = filesize($fullpath);
+		 
+		 //flag restorable if filesize is ok
+		 $maxfilesize = majhub\setting::get('maxrestorablebackupsize');
+		 $restorable=true;
+		 if($maxfilesize){
+			$restorable = $filesize <= $maxfilesize;
+		 }
 		 
 		 //Get the user to make the owner of this course
 		 $user = $DB->get_record('user', array('email' => $courseinfo->publisheremail));
@@ -165,6 +193,7 @@ function local_majhub_hub_course_received_handler($courseid)
 			$courseware->sitecourseid = $courseinfo->sitecourseid;
 			
 			$courseware->filesize     = $filesize;
+			$courseware->unrestorable = !$restorable;
 			$courseware->version      = '1.0';
 			$courseware->timecreated  = time();
 			$courseware->timemodified = $courseware->timecreated;
@@ -181,6 +210,9 @@ function local_majhub_hub_course_received_handler($courseid)
 		$courseware->timeuploaded = $file->get_timecreated();
 		$courseware->timemodified = $courseware->timeuploaded;
 		$DB->update_record('majhub_coursewares', $courseware);
+		
+		//call this here rather than wait for cron, so logging to error works and debugging faster
+		//local_majhub_cron();
 	
 }
 

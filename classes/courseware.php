@@ -45,6 +45,16 @@ class courseware
     public $courseid;
     /** @var int|null */
     public $hubcourseid;
+	/** @var int|0 */
+	public $siteid;
+	/** @var int|0 */
+	public $sitecourseid;
+	/** @var string */
+	public $backupversion;
+	/** @var string */
+	public $backuprelease;
+	/** @var boolean|false*/
+	public $unrestorable;
     /** @var int|null */
     public $previousid;
     /** @var string */
@@ -141,7 +151,8 @@ class courseware
     public function is_reviewed_by($userid)
     {
         global $DB;
-        return $DB->record_exists(review::TABLE, array('coursewareid' => $this->id, 'userid' => $userid));
+		return $DB->record_exists(review::TABLE, array('siteid' => $this->siteid,'sitecourseid' => $this->sitecourseid, 'userid' => $userid));
+        //return $DB->record_exists(review::TABLE, array('coursewareid' => $this->id, 'userid' => $userid));
     }
 
     /**
@@ -155,7 +166,8 @@ class courseware
     {
         global $DB;
 
-        $records = $DB->get_records(review::TABLE, array('coursewareid' => $this->id), $sort, '*', 0, (int)$limit);
+       // $records = $DB->get_records(review::TABLE, array('coursewareid' => $this->id), $sort, '*', 0, (int)$limit);
+	   $records = $DB->get_records(review::TABLE, array('siteid' => $this->siteid,'sitecourseid' => $this->sitecourseid), $sort, '*', 0, (int)$limit);
         return array_map(function ($record) { return review::from_record($record); }, $records);
     }
 
@@ -209,6 +221,11 @@ class courseware
         $courseware->demourl      = isset($record->demourl)    ? trim($record->demourl)   : null;
         $courseware->fileid       = isset($record->fileid)     ? (int)$record->fileid     : null;
         $courseware->courseid     = isset($record->courseid)   ? (int)$record->courseid   : null;
+		 $courseware->siteid     = isset($record->siteid)   ? (int)$record->siteid   : 0;
+		 $courseware->sitecourseid     = isset($record->sitecourseid)   ? (int)$record->sitecourseid   : 0;
+		 $courseware->unrestorable     = isset($record->unrestorable)   ? (boolean)$record->unrestorable   : false;
+		 $courseware->backuprelease     = isset($record->backuprelease)   ? trim($record->backuprelease)   : 'unknown';
+		 $courseware->backupversion     = isset($record->backupversion)   ? trim($record->backupversion)   : 'unknown';
         $courseware->hubcourseid  = isset($record->hubcourseid)   ? (int)$record->hubcourseid   : null;
         $courseware->previousid   = isset($record->previousid) ? (int)$record->previousid : null;
         $courseware->version      = trim($record->version);
