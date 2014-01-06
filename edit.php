@@ -5,6 +5,7 @@ require_once __DIR__.'/../../lib/filelib.php';
 require_once __DIR__.'/classes/courseware.php';
 require_once __DIR__.'/classes/capability.php';
 require_once __DIR__.'/classes/element.php';
+require_once __DIR__.'/classes/user.php';
 
 function tag($tagName) { return new majhub\element($tagName); }
 
@@ -53,6 +54,11 @@ if (optional_param('updatemetadata', null, PARAM_TEXT)) {
         if (!$response || $response->status != 200)
             $demourl = null;
     }
+	$updatedcontributor = optional_param('updatedcontributor', null, PARAM_INT);
+    if ($updatedcontributor) {
+        $courseware->userid = $updatedcontributor; 
+    }
+	
     $courseware->demourl = empty($demourl) ? null : $demourl;
     $invalidfields = array();
     if (isset($_POST['metadata']) && is_array($_POST['metadata'])) {
@@ -103,13 +109,25 @@ if (optional_param('updated', null, PARAM_TEXT)) {
     echo $div_message->end();
 }
 
+//by default show the user who is currently the course owner
 $userlink = $OUTPUT->action_link(
-    new moodle_url('/user/profile.php', array('id' => $courseware->user->id)),
-    fullname($courseware->user)
-    );
+	new moodle_url('/user/profile.php', array('id' => $courseware->user->id)),
+	fullname($courseware->user)
+	);
+
+//if admin, display a selector so we can change the contributor
+if($isadmin){
+	$selector = new majhub\majhub_user_selector('updatedcontributor', array());
+	$selectorhtml = get_string('selectnewcontributor', 'local_majhub');
+	$selectorhtml .= $selector->display(true);
+}
+
+
+    
 $fixedrows = array(
     get_string('title', 'local_majhub')       => $courseware->fullname,
     get_string('contributor', 'local_majhub') => $userlink,
+	"" => $selectorhtml,
     get_string('uploadedat', 'local_majhub')  => userdate($courseware->timeuploaded),
     get_string('filesize', 'local_majhub')    => display_size($courseware->filesize),
 //  get_string('version', 'local_majhub')     => $courseware->version,

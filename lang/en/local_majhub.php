@@ -113,3 +113,6 @@ $string['error:metafield:duplicateoption'] = 'Duplicate option cannot be set';
 $string['maxrestorablebackupsize'] ='Maximum backup file size for restoration';
 $string['minrestorableversion'] ='Minimum required Moodle version';
 $string['moodleversion'] ='Moodle version';
+
+$string['potentialcontributors'] ='Potential Contributors';
+$string['selectnewcontributor'] ='Select from the list of users, to change the course contributor';
