@@ -147,7 +147,7 @@ function local_majhub_hub_course_received_handler($courseid)
 	require_once __DIR__.'/classes/setting.php';
 
 	//use majhub\setting;
-	error_log('here1');
+
 	$storage = new majhub\storage();
 
 		$courseinfo = $DB->get_record('hub_course_directory', array('id' => $courseid), '*', IGNORE_MISSING);
