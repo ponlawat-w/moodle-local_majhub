@@ -6,6 +6,7 @@ require_once __DIR__.'/classes/courseware.php';
 require_once __DIR__.'/classes/capability.php';
 require_once __DIR__.'/classes/element.php';
 require_once __DIR__.'/classes/user.php';
+require_once __DIR__.'/lib.php';
 
 function tag($tagName) { return new majhub\element($tagName); }
 
@@ -77,6 +78,7 @@ if (optional_param('updatemetadata', null, PARAM_TEXT)) {
     	//update the contributing sitecourseid
     	$courseware->sitecourseid = $updatedsitecourseid;
 	}
+	
 
     $courseware->demourl = empty($demourl) ? null : $demourl;
     $invalidfields = array();
@@ -94,7 +96,7 @@ if (optional_param('updatemetadata', null, PARAM_TEXT)) {
     
     
     /*when the sync does not occur, following an upload, this will do it */
-    $resync =  optional_param('rsync', 0, PARAM_INT);
+    $resync =  optional_param('resync', 0, PARAM_INT);
     if($resync && $isadmin){
     	local_majhub_hub_course_received_handler($resync);
     }
