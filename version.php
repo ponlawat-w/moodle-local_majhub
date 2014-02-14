@@ -2,8 +2,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2014010600;
-$plugin->release   = '2.5, release 4';
+$plugin->version   = 2014021400;
+$plugin->release   = '2.5, release 5';
 $plugin->requires  = 2012062500.00; // Moodle 2.3.0
 $plugin->component = 'local_majhub';
 $plugin->cron      = 1;

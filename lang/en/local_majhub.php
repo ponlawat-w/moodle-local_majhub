@@ -116,3 +116,7 @@ $string['moodleversion'] ='Moodle version';
 
 $string['potentialcontributors'] ='Potential Contributors';
 $string['selectnewcontributor'] ='Select from the list of users, to change the course contributor';
+
+$string['site'] ='Original Site';
+$string['sitecourseid'] ='Original Course ID';
+$string['resync'] ='Resync (CAREFULLY!!)';

@@ -54,11 +54,30 @@ if (optional_param('updatemetadata', null, PARAM_TEXT)) {
         if (!$response || $response->status != 200)
             $demourl = null;
     }
+    //update the contributing user
 	$updatedcontributor = optional_param('updatedcontributor', null, PARAM_INT);
     if ($updatedcontributor) {
         $courseware->userid = $updatedcontributor; 
     }
+    
+    //update the contributing site
+	$updatedsiteid = optional_param('updatedsiteid', 0, PARAM_INT);
+	$updatedsitecourseid = optional_param('updatedsitecourseid', 0, PARAM_INT);
+	$oldsitecourseid=false;
+	$oldsiteid=false;
 	
+	if($updatedsiteid  && $updatedsitecourseid){ 
+		if($courseware->sitecourseid != $updatedsitecourseid || $courseware->siteid != $updatedsiteid){
+				$oldsitecourseid=$courseware->sitecourseid;
+				$oldsiteid=$courseware->siteid;
+		}
+    	//update the contributing site
+		$courseware->siteid = $updatedsiteid; 
+
+    	//update the contributing sitecourseid
+    	$courseware->sitecourseid = $updatedsitecourseid;
+	}
+
     $courseware->demourl = empty($demourl) ? null : $demourl;
     $invalidfields = array();
     if (isset($_POST['metadata']) && is_array($_POST['metadata'])) {
@@ -72,8 +91,26 @@ if (optional_param('updatemetadata', null, PARAM_TEXT)) {
             }
         }
     }
+    
+    
+    /*when the sync does not occur, following an upload, this will do it */
+    $resync =  optional_param('rsync', 0, PARAM_INT);
+    if($resync && $isadmin){
+    	local_majhub_hub_course_received_handler($resync);
+    }
+    
     if (empty($invalidfields)) {
         $courseware->update();
+        //if we changed the siteids, lets change on the standard hub too
+        if($oldsiteid && $oldsitecourseid){
+        	 $course = new stdClass();
+        	$course->id = $courseware->hubcourseid;
+        	$course->siteid = $updatedsiteid;
+        	$course->sitecourseid = $updatedsitecourseid;
+            $DB->update_record('hub_course_directory', $course);
+        	 
+        }
+        
         redirect($courseurl ?: new moodle_url($PAGE->url, array('updated' => true)));
     }
 }
@@ -115,11 +152,13 @@ $userlink = $OUTPUT->action_link(
 	fullname($courseware->user)
 	);
 
-//if admin, display a selector so we can change the contributor
+//if admin, display a selectors so we can update contributor, site and sitecourseid
 if($isadmin){
 	$selector = new majhub\majhub_user_selector('updatedcontributor', array());
 	$selectorhtml = get_string('selectnewcontributor', 'local_majhub');
 	$selectorhtml .= $selector->display(true);
+}else{
+	$selectorhtml= "";
 }
 
 
@@ -132,6 +171,9 @@ $fixedrows = array(
     get_string('filesize', 'local_majhub')    => display_size($courseware->filesize),
 //  get_string('version', 'local_majhub')     => $courseware->version,
     );
+ 
+ 
+
 
 echo $form = tag('form')->action($PAGE->url)->method('post')->classes('mform')->start();
 echo tag('div')->style('display', 'none')->append(
@@ -141,6 +183,22 @@ echo $table = tag('table')->classes('metadata')->start();
 foreach ($fixedrows as $name => $value) {
     echo row($name, $value);
 }
+
+//if admin, display selectors so we can select site id
+if($isadmin){
+	$options = $DB->get_records_select_menu('hub_site_directory','');
+	if($options){
+		//output site select
+		echo row(get_string('site', 'local_majhub'), html_writer::select($options, 'updatedsiteid', $courseware->siteid));
+		//output site course id input
+		$inputattributes=array();
+		$inputattributes['name'] = "updatedsitecourseid";
+		$inputattributes['value'] = $courseware->sitecourseid;	
+		echo row(get_string('sitecourseid', 'local_majhub'), html_writer::empty_tag('input', $inputattributes));
+	}
+}
+
+
 echo row(get_string('demourl', 'local_majhub'),
     tag('input')->type('text')->name('demourl')->value($courseware->demourl)->size(50)
     );
@@ -155,6 +213,27 @@ foreach ($courseware->metadata as $metadatum) {
     }
     echo row($name, $metadatum->render_form_element('metadata'), $attr);
 }
+
+
+//if admin, display an option to rysync an upload that arrived at hub butnot maj hub
+if($isadmin){
+	$result = $DB->get_records('majhub_coursewares',array(),null,'hubcourseid');
+	if($result){
+		$idset = array();
+		foreach($result as $rowdata){
+			$idset[] = $rowdata->hubcourseid;
+		}
+		$notset = " id NOT IN (" . implode(',',$idset) .  ") ";
+	
+		$sort='id';
+		$selectfields="id,concat(id,fullname)";
+		$options = $DB->get_records_select_menu('hub_course_directory',$notset, null, $sort, $selectfields);
+		//print_r($options);
+		echo row(get_string('resync', 'local_majhub'), html_writer::select($options, 'resync'));
+	}
+}
+
+
 $buttons = tag('input')->type('submit')->name('updatemetadata')->value(get_string('savechanges'));
 if ($courseurl) {
     $buttons .= '  ';
@@ -168,6 +247,8 @@ echo $div_content->end();
 echo $li_section->end();
 echo $ul_topics->end();
 echo $div_course_content->end();
+
+
 
 echo $OUTPUT->footer();
 
