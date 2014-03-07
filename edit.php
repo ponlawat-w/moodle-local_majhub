@@ -55,6 +55,13 @@ if (optional_param('updatemetadata', null, PARAM_TEXT)) {
         if (!$response || $response->status != 200)
             $demourl = null;
     }
+	
+	 //update the course title / fullname
+	$fullname = optional_param('fullname', null, PARAM_TEXT);
+    if ($fullname) {
+        $courseware->fullname = $fullname; 
+    }
+	
     //update the contributing user
 	$updatedcontributor = optional_param('updatedcontributor', null, PARAM_INT);
     if ($updatedcontributor) {
@@ -166,7 +173,7 @@ if($isadmin){
 
     
 $fixedrows = array(
-    get_string('title', 'local_majhub')       => $courseware->fullname,
+   // get_string('title', 'local_majhub')       => $courseware->fullname,
     get_string('contributor', 'local_majhub') => $userlink,
 	"" => $selectorhtml,
     get_string('uploadedat', 'local_majhub')  => userdate($courseware->timeuploaded),
@@ -182,6 +189,14 @@ echo tag('div')->style('display', 'none')->append(
     tag('input')->type('hidden')->name('id')->value($id)
     );
 echo $table = tag('table')->classes('metadata')->start();
+
+//added the ability to edit the title of the course
+if($isadmin){
+echo row(get_string('title', 'local_majhub'),
+    tag('input')->type('text')->name('fullname')->value($courseware->fullname)->size(50)
+    );
+}
+
 foreach ($fixedrows as $name => $value) {
     echo row($name, $value);
 }
