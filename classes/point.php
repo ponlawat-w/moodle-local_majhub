@@ -99,6 +99,22 @@ class point
                 array('userid' => $this->userid, 'reason' => 'quality')
                 );
                 */
+    	case 'user':
+        
+        	$ret = $DB->get_record_sql(
+                'SELECT SUM(u.points) AS pointtotal FROM {majhub_user_points} u
+                 WHERE u.userid = :userid',
+                array('userid' => $this->userid)
+                );
+            
+     
+            if(is_object($ret) && is_numeric($ret->pointtotal) && $ret->pointtotal > 0 ){
+            	return $this->_cache[$name] = $ret->pointtotal;
+            	unset($ret);
+            }else{
+            	return $this->_cache[$name] = 0;
+            }
+            
         case 'download':
         $downloadingcount = $DB->count_records_sql(
                 'SELECT COUNT(d.id) FROM {majhub_courseware_downloads} d
@@ -108,12 +124,14 @@ class point
                 );
        
             return $this->_cache[$name] = self::get_settings()->pointsfordownloading * $downloadingcount;
+            
         case 'total':
             return $this->registration
                  + $this->upload
                  + $this->review
                  + $this->popularity
                  + $this->quality
+                 + $this->user
                  - $this->download;
         }
         throw new \InvalidArgumentException();

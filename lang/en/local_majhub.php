@@ -120,3 +120,12 @@ $string['selectnewcontributor'] ='Select from the list of users, to change the c
 $string['site'] ='Original Site';
 $string['sitecourseid'] ='Original Course ID';
 $string['resync'] ='Resync (CAREFULLY!!)';
+
+$string['settings/assign'] ='Assign Points';
+$string['givepoints'] ='Give Points';
+$string['removepoints'] ='Remove Points';
+$string['allocatepoints'] ='Points';
+$string['reason'] ='Reason';
+$string['giveresult'] ='Assigned {$a->points} points each to {$a->users} users.';
+$string['removeresult'] ='Removed {$a->points} points each from {$a->users} users.'; 
+

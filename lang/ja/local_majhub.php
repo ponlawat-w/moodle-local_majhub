@@ -108,3 +108,11 @@ $string['error:metafield:emptyname'] = '名称は必須です';
 $stirng['error:metafield:emptyoptions'] = 'テキスト以外のタイプではオプションが必須です';
 $string['error:metafield:duplicatename'] = 'この名称は既に使用されています';
 $string['error:metafield:duplicateoption'] = 'オプションに重複した項目があります';
+
+$string['settings/assign'] ='ポイント配布';
+$string['givepoints'] ='ポイント追加';
+$string['removepoints'] ='ポイント減らす';
+$string['allocatepoints'] ='ポイント';
+$string['reason'] ='理由';
+$string['giveresult'] ='{$a->points} ポイントずつを {$a->users} ユーザーに追加した。';
+$string['removeresult'] ='{$a->points} ポイントずつを {$a->users} ユーザーから減らした。';
