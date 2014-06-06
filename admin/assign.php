@@ -26,6 +26,7 @@ if ($data = $action_form->get_data()) {
     switch ($data->action) {
         case 1: $assign = $data->points;break;
         case 2: $assign = $data->points * -1;break;
+        case 3: $assign =-1;break;
         default: $assign =0;
     }
 }
@@ -33,11 +34,12 @@ if ($data = $action_form->get_data()) {
 $user_bulk_form = new user_bulk_form(null, get_selection_data($ufiltering));
 
 $udata = $user_bulk_form->get_data();
-
-if($assign!=0){
+$updatedusers=0;
+//points update
+if($assign>0){
         //$isadmin = majhub\capability::is_admin($USER);
        // $ismoderator = majhub\capability::is_moderator($USER);
-       $updatedusers=0;
+       
        foreach($SESSION->bulk_users as $userid) {
 			if ($userid == -1) {
 				continue;
@@ -51,6 +53,27 @@ if($assign!=0){
 			$DB->insert_record('majhub_user_points', $majuserpoints);
 			$updatedusers++;        
        }
+//profile update
+}elseif($assign<0 && $data->profilefield){
+	foreach($SESSION->bulk_users as $userid) {
+			if ($userid == -1) {
+				continue;
+			}
+			$conditions = array('userid'=>$userid, 'fieldid'=>$data->profilefield);
+			if($DB->record_exists('user_info_data',$conditions)){
+				$DB->set_field('user_info_data','data',$data->profilefieldvalue,$conditions);
+				$updatedusers++;
+			}else{
+				$profile_field_data = new stdClass();
+				$profile_field_data->userid=$userid;
+				$profile_field_data->fieldid=$data->profilefield;
+				$profile_field_data->data=$data->profilefieldvalue;
+				$profile_field_data->format=0;
+				$ret = $DB->insert_record('user_info_data',$profile_field_data);
+				if($ret){$updatedusers++;}
+				
+			}
+	}
 }
 
 //This is the do block
@@ -68,6 +91,12 @@ if($assign!=0){
 			$result->points = $data->points;
 			$result->users = $updatedusers;
 			$actionperformed = get_string('removeresult','local_majhub',$result);
+			break;
+		case 3:
+			$result = new stdClass;
+			$result->updatedvalue = $data->profilefieldvalue;
+			$result->users = $updatedusers;
+			$actionperformed = get_string('profileresult','local_majhub',$result);
 			break;
 		default:echo "nothing";break;
 	

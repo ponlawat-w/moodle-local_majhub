@@ -127,5 +127,10 @@ $string['removepoints'] ='Remove Points';
 $string['allocatepoints'] ='Points';
 $string['reason'] ='Reason';
 $string['giveresult'] ='Assigned {$a->points} points each to {$a->users} users.';
-$string['removeresult'] ='Removed {$a->points} points each from {$a->users} users.'; 
-
+$string['removeresult'] ='Removed {$a->points} points each from {$a->users} users.';
+$string['profileresult'] ='Set selected profile field to {$a->updatedvalue} for {$a->users} users.'; 
+$string['setprofilefield'] ='Set user profile field'; 
+$string['profilefield'] ='User profile field'; 
+$string['profilefieldvalue'] ='new value'; 
+$string['pointsheader'] ='Points Actions'; 
+$string['profileheader'] ='Profile Actions';
