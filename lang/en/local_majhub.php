@@ -134,3 +134,5 @@ $string['profilefield'] ='User profile field';
 $string['profilefieldvalue'] ='new value'; 
 $string['pointsheader'] ='Points Actions'; 
 $string['profileheader'] ='Profile Actions';
+
+$string['settings/managecourses'] ='Manage Courses';

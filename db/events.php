@@ -13,6 +13,11 @@ $handlers = array(
         'handlerfunction' => 'local_majhub_hub_course_received_handler',
         'schedule'        => 'instant',
     ),
+	'hub_course_deleted' => array(
+        'handlerfile'     => '/local/majhub/lib.php',
+        'handlerfunction' => 'local_majhub_hub_course_deleted_handler',
+        'schedule'        => 'instant',
+    ),
     'hub_courses_removed' => array(
         'handlerfile'     => '/local/majhub/lib.php',
         'handlerfunction' => 'local_majhub_hub_courses_removed_handler',

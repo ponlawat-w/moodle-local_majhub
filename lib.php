@@ -217,6 +217,13 @@ function local_majhub_hub_course_received_handler($courseid)
 	
 }
 
+function local_majhub_hub_course_deleted_handler($courseid)
+{
+	$courseids = array($courseid);
+	 local_majhub_hub_courses_removed_handler($courseids);
+}
+
+
 function local_majhub_hub_courses_removed_handler($courseids)
 {
 	global $DB,$CFG;
