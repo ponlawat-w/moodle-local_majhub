@@ -136,3 +136,4 @@ $string['pointsheader'] ='Points Actions';
 $string['profileheader'] ='Profile Actions';
 
 $string['settings/managecourses'] ='Manage Courses';
+$string['originalversion'] ='Original Version';

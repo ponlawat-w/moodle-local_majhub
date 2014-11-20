@@ -8,6 +8,7 @@
 namespace majhub;
 
 require_once __DIR__.'/scoped.php';
+require_once(dirname(dirname(__FILE__)).'/lib.php');
 
 /**
  *  MAJ Hub file storage manager
@@ -140,6 +141,26 @@ class storage
             );
         return $this->storage->create_file_from_pathname($filerecord, $fullpath);
     
+    }
+    
+    //added Justin to bridge the MAJ Hub and the Plain Hub 20131014
+    //But this is not a solution for the future. We will eventually
+    // just swap out MAJ file logic for Plain Hub logic
+    public function remove_from_storage($fileid, $timecreated, $hubcourseid){
+    	 global $CFG, $DB;
+    	 try{
+			 //delete MAJ Hub file
+			 $file = $this->storage->get_file_by_id($fileid);
+			 $file->delete();
+			 //Delete temp file stored in Standard Hub dir
+			 $newpath  = \local_majhub_fetch_versioned_filepath($hubcourseid, $timecreated);
+			 unlink($newpath);
+			 return true;
+    	 }catch(Exception $e){
+    	 	error_log($e->getMessage());
+    	 	return false;
+    	 }
+    	 
     }
 
     /**

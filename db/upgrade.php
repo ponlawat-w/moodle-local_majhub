@@ -272,6 +272,25 @@ function xmldb_local_majhub_upgrade($oldversion = 0)
             $dbman->create_table($table);
         }
     }
+    
+    if ($oldversion < 2014111800) {
+        $table = new xmldb_table('majhub_courseware_versions');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('coursewareid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
+        $table->add_field('description', XMLDB_TYPE_CHAR, 255, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('filesize', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('fileid', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        $DB->execute(
+        		"INSERT INTO {majhub_courseware_versions} ( `coursewareid`, `description`,`filesize`,`fileid`,`timecreated`) 
+        		SELECT id,'Original File',filesize,fileid,timecreated FROM {majhub_coursewares}"
+        		);
+	 
+    }
 
     
     

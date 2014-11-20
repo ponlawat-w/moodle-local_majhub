@@ -137,7 +137,31 @@ function local_majhub_user_created_handler($user)
     }
 }
 
-function local_majhub_hub_course_received_handler($courseid)
+
+
+
+//this is the HUB backupfile file location
+//there are several ids and its too confusing. But I explain:
+//courseware:id = the id of the record in courseware table
+//courseware:courseid = the course id of this course on this site(ie moodles course id)
+//courseware:sitecourseid = the course of this course on the original publishing site
+//courseware:hubcourseid = the id of the record for this course in the standard hubs hub_course_directory table
+//in this and related functions we are temporiy using original course dir. Later hope to use exclusively
+function local_majhub_hub_fetch_course_filepath($courseid){
+	global $CFG;
+		 $level1 = floor($courseid / 1000) * 1000;
+		 $userdir = "hub/$level1/$courseid";
+		 $fullpath = $CFG->dataroot . '/' . $userdir . '/backup_' . $courseid . ".mbz";
+		 return $fullpath;
+}
+//this is a temp filepath in same dir as HUB backupfile file location
+function local_majhub_fetch_versioned_filepath($courseid, $timecreated){
+		$basepath = local_majhub_hub_fetch_course_filepath($courseid);
+		$newpath =  str_replace('.mbz', '_' . $timecreated . '.mbz',$basepath);
+		return $newpath;
+}
+
+function local_majhub_hub_course_received_handler($hubcourseid)
 {
 
  	global $DB,$CFG;
@@ -150,22 +174,8 @@ function local_majhub_hub_course_received_handler($courseid)
 
 	$storage = new majhub\storage();
 
-		$courseinfo = $DB->get_record('hub_course_directory', array('id' => $courseid), '*', IGNORE_MISSING);
+		$courseinfo = $DB->get_record('hub_course_directory', array('id' => $hubcourseid), '*', IGNORE_MISSING);
 		
-		//we don't want to have to re store the file
-		//this is only temporary, scaffolding till we re work MAJ hub to use plain hub backup file
-		 $level1 = floor($courseid / 1000) * 1000;
-		 $userdir = "hub/$level1/$courseid";
-		 $fullpath = $CFG->dataroot . '/' . $userdir . '/backup_' . $courseid . ".mbz";
-		 $filename = 'backup_' . $courseid . '.mbz';
-		 $filesize = filesize($fullpath);
-		 
-		 //flag restorable if filesize is ok
-		 $maxfilesize = majhub\setting::get('maxrestorablebackupsize');
-		 $restorable=true;
-		 if($maxfilesize){
-			$restorable = $filesize <= $maxfilesize;
-		 }
 		 
 		 //Get the user to make the owner of this course
 		 $user = $DB->get_record('user', array('email' => $courseinfo->publisheremail));
@@ -179,6 +189,22 @@ function local_majhub_hub_course_received_handler($courseid)
 	
 		// checks if the courseware exists, it shouldn't ...
 		$courseware = $DB->get_record('majhub_coursewares', array('hubcourseid' => $courseinfo->id));
+		
+
+		 $fullpath = local_majhub_hub_fetch_course_filepath($hubcourseid);
+		 //$filename = 'backup_' . $courseid . '.mbz';
+		 $filename = basename($fullpath);
+		 $filesize = filesize($fullpath);
+		 
+		 //flag restorable if filesize is ok
+		 $maxfilesize = majhub\setting::get('maxrestorablebackupsize');
+		 $restorable=true;
+		 if($maxfilesize){
+			$restorable = $filesize <= $maxfilesize;
+		 }
+		
+		
+		
 		if(!$courseware){
 			$courseware = new stdClass;
 			$courseware->userid       = $userid;
@@ -211,6 +237,16 @@ function local_majhub_hub_course_received_handler($courseid)
 		$courseware->timeuploaded = $file->get_timecreated();
 		$courseware->timemodified = $courseware->timeuploaded;
 		$DB->update_record('majhub_coursewares', $courseware);
+		
+		//add a record to our version table also
+		//if we got here it would also be good to update our version table
+		$versioninfo = new stdClass();
+		$versioninfo->coursewareid=$courseware->id;
+		$versioninfo->description = get_string('originalversion','local_majhub');
+		$versioninfo->fileid = $courseware->filesize;
+		$versioninfo->fileid = $courseware->fileid;
+		$versioninfo->timecreated = $courseware->timemodified;
+		$DB->insert_record('majhub_courseware_versions',$versioninfo);
 		
 		//call this here rather than wait for cron, so logging to error works and debugging faster
 		//local_majhub_cron();
