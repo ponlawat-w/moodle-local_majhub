@@ -122,6 +122,7 @@ $string['sitecourseid'] ='Original Course ID';
 $string['resync'] ='Resync (CAREFULLY!!)';
 
 $string['settings/assign'] ='Assign Points';
+$string['settings/reports'] ='Reports';
 $string['givepoints'] ='Give Points';
 $string['removepoints'] ='Remove Points';
 $string['allocatepoints'] ='Points';
@@ -137,3 +138,29 @@ $string['profileheader'] ='Profile Actions';
 
 $string['settings/managecourses'] ='Manage Courses';
 $string['originalversion'] ='Original Version';
+//reports
+$string['returntoreports'] ='Return to Reports';
+$string['allusers'] ='All Users';
+$string['allusersreport'] ='All Users Report';
+$string['nodataavailable'] ='No Data Available';
+$string['reports'] ='Reports';
+$string['reporttitle'] ='Report Title {$a}';
+$string['exportcsv'] ='Export to CSV';
+$string['exportexcel'] ='Export to Excel(csv)';
+$string['exportpdf'] ='Export to PDF';
+$string['selectanother'] ='Back to Course';
+$string['fullname'] ='Full Name';
+$string['username'] ='Username';
+$string['email'] ='Email';
+$string['lastaccess'] ='Last Access';
+$string['points'] ='Points';
+$string['pointsreport'] ='Points Report';
+$string['neveraccessed'] ='Never';
+$string['registration'] ='Regn';
+$string['upload'] ='Upload';
+$string['review'] ='Rev.';
+$string['popularity'] ='Pop.';
+$string['quality'] ='Qual.';
+$string['user'] ='User';
+$string['download'] ='Downld';
+$string['total'] ='Total';

@@ -1,0 +1,14 @@
+
+div.local_majhub_listbuttons {
+	display: block;
+	/*float: left;*/
+}
+.local_majhub_listbuttons input[type="submit"]{
+	width: 400px;
+	/*float: left;*/
+}
+
+div.local_majhub_actionbuttons {
+	display: flex;
+	float: right;
+}

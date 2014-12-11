@@ -32,4 +32,7 @@ if (empty($CFG->customfrontpageinclude) || realpath($CFG->customfrontpageinclude
     $ADMIN->add('majhub', new admin_externalpage('majhub/assign',
         new lang_string('settings/assign', 'local_majhub'),
         new moodle_url('/local/majhub/admin/assign.php')));
+	$ADMIN->add('majhub', new admin_externalpage('majhub/reports',
+        new lang_string('settings/reports', 'local_majhub'),
+        new moodle_url('/local/majhub/admin/reports.php')));
 }

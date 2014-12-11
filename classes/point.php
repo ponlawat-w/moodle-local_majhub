@@ -38,7 +38,7 @@ class point
     }
 
     /**
-     *  Gets a dymanic property
+     *  Gets a dynamic property
      *  
      *  @global \moodle_database $DB
      *  @param string $name
