@@ -187,6 +187,9 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 					break;
 				case 'email':
 					$ret = $record->user->email;
+					if($withlinks){
+						$ret = $this->truncate($ret,30);
+					}
 					break;
 				case 'points':
 						$ret = $record->points;
