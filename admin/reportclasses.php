@@ -176,13 +176,13 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 				case 'fullname':
 					$ret = fullname($record->user);
 					if($withlinks){
-						$ret = $this->truncate($ret,40);
+						$ret = $this->truncate($ret,35);
 					}
 					break;
 				case 'username':
 					$ret = $record->user->username;
 					if($withlinks){
-						$ret = $this->truncate($ret,40);
+						$ret = $this->truncate($ret,35);
 					}
 					break;
 				case 'email':
@@ -253,13 +253,13 @@ class local_majhub_points_report extends  local_majhub_base_report {
 				case 'fullname':
 					$ret = fullname($record->u);
 					if($withlinks){
-						$ret = $this->truncate($ret,40);
+						$ret = $this->truncate($ret,35);
 					}
 					break;
 				case 'username':
 					$ret = $record->u->username;
 					if($withlinks){
-						$ret = $this->truncate($ret,40);
+						$ret = $this->truncate($ret,35);
 					}
 					break;
 				case 'download':

@@ -31,37 +31,19 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once(dirname(__FILE__).'/reportclasses.php');
 
 
-//$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-//$n  = optional_param('n', 0, PARAM_INT);  // tquiz instance ID - it should be named as the first character of the module
 $format = optional_param('format', 'html', PARAM_TEXT); //export format csv or html
 $showreport = optional_param('report', 'menu', PARAM_TEXT); // report type
-//$questionid = optional_param('questionid', 0, PARAM_INT); // report type
-//$userid = optional_param('userid', 0, PARAM_INT); // report type
-//$attemptid = optional_param('attemptid', 0, PARAM_INT); // report type
 
-/*
-if ($id) {
-    $cm         = get_coursemodule_from_id('local_majhub', $id, 0, false, MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $tquiz  = $DB->get_record('local_majhub', array('id' => $cm->instance), '*', MUST_EXIST);
-} elseif ($n) {
-    $tquiz  = $DB->get_record('local_majhub', array('id' => $n), '*', MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $tquiz->course), '*', MUST_EXIST);
-    $cm         = get_coursemodule_from_instance('local_majhub', $tquiz->id, $course->id, false, MUST_EXIST);
-} else {
-    error('You must specify a course_module ID or an instance ID');
-}
-*/
 require_login();
-//$modulecontext = context_module::instance($cm->id);
-$modulecontext = context_system::instance();
+
+$context = context_system::instance();
 
 /// Set up the page header
+$PAGE->set_context($context);
 $PAGE->set_url('/local/majhub/admin/reports.php');
-//$PAGE->set_title(format_string($tquiz->name));
-//$PAGE->set_heading(format_string($course->fullname));
-$PAGE->set_context($modulecontext);
-$PAGE->set_pagelayout('course');
+$PAGE->set_title(get_string('reports','local_majhub'));
+$PAGE->set_heading(get_string('reports','local_majhub'));
+$PAGE->set_pagelayout('admin');
 
 //This puts all our display logic into the renderer.php files in this plugin
 $reportrenderer = $PAGE->get_renderer('local_majhub','report');
