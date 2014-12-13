@@ -412,10 +412,11 @@ class local_majhub_mailchimp_report extends  local_majhub_base_report {
 				}
 				
 				//purge any emails/users that might flag us as spam
+				$itsbad = false;
 				if(!$profilefields->majmember){
 					//identify old data, spamtraps, invalid users and remove 
 					if(!$user->lastaccess){
-						continue;
+						$itsbad = true;
 					}			
 
 					//if 1 year since lastaccess continue
@@ -425,22 +426,24 @@ class local_majhub_mailchimp_report extends  local_majhub_base_report {
 					$e =$date = new DateTime();
 					$diff = $e->diff($s);
 					if($diff->days > 365){
-						continue;
+						$itsbad = true;
 					}
 					
 					//if this is not a human regn (ie a site reg for publishing)
 					if(!$user->firstname || !$user->email ||  strpos($user->firstname,'http')===0){
-						continue;
+						$itsbad = true;
 					}
 					//if this is a role based email, purge it
-					$itsarole=false;
 					$roles = array('webmaster','root','admin','postmaster','noreply','no-reply','list');
 					foreach ($roles as $role){
 						if(strpos($user->email,$role . '@')===0){
-							$itsarole=true;
+							$itsbad = true;
 						}
 					}
-					if($itsarole){continue;}	
+					if($itsbad){
+						//echo 'itsbad:' . $user->email . '<br />';
+						continue;
+					}	
 				}
 				//add data to return array
 				$alldata[]= $adata;
