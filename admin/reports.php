@@ -62,6 +62,10 @@ switch ($showreport){
 	case 'points':
 		$report = new local_majhub_points_report();
 		$formdata = new stdClass();
+		break;
+	case 'mailchimp':
+		$report = new local_majhub_mailchimp_report();
+		$formdata = new stdClass();
 		break;	
 	case 'menu':
 	default:

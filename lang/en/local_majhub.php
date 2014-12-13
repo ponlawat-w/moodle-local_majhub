@@ -168,3 +168,6 @@ $string['firstname'] ='firstname';
 $string['lastname'] ='lastname';
 $string['idnumber'] ='idnumber';
 $string['language'] ='language';
+$string['majmember'] ='majmember';
+$string['mailchimp'] ='mailchimp';
+$string['mailchimpreport'] ='Mailchimp Import Report';

@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once __DIR__.'/../classes/point.php';
+require_once("$CFG->dirroot/user/profile/lib.php");
 
 /**
  * Classes for Reports in MAJHub
@@ -158,7 +159,173 @@ abstract class local_majhub_base_report {
 class local_majhub_allusers_report extends  local_majhub_base_report {
 	
 	protected $report="allusers";
-	protected $fields = array('firstname','lastname','idnumber','username','language','email','lastaccess','points');	
+	protected $fields = array('fullname','username','language','email','points','lastaccess');	
+	protected $headingdata = null;
+	protected $qcache=array();
+	protected $ucache=array();
+	
+	public function fetch_formatted_field($field,$record,$withlinks){
+				global $DB;
+			switch($field){
+				
+				case 'fullname':
+					$ret = fullname($record->u);
+					if($withlinks){
+						$ret = $this->truncate($ret,35);
+					}
+					break;
+
+				case 'username':
+					$ret = $record->user->username;
+					if($withlinks){
+						$ret = $this->truncate($ret,35);
+					}
+					break;
+				case 'language':
+					$ret = $record->user->lang;
+					break;
+				case 'email':
+					$ret = $record->user->email;
+					if($withlinks){
+						$ret = $this->truncate($ret,30);
+					}
+					break;
+				case 'points':
+						$ret = $record->points;
+					break;
+				case 'lastaccess':
+					if($record->user->lastaccess){
+						$ret =  date("Y-m-d",$record->user->lastaccess);
+					}else{
+						$ret = get_string('neveraccessed', 'local_majhub');
+					}
+					break;
+				
+				default:
+					if(property_exists($record,$field)){
+						$ret=$record->{$field};
+					}else{
+						$ret = '';
+					}
+			}
+			return $ret;
+	}
+	
+	public function fetch_formatted_heading(){
+		return get_string('allusersreport','local_majhub');
+	}
+	
+	public function process_raw_data($formdata){
+		global $DB;
+
+		//no data in the heading, so an empty class even is overkill ..
+		$this->headingdata = new stdClass();
+		//get all the users in the db
+		$users = $DB->get_records('user',array('deleted'=>0));
+		
+		$alldata=array();
+		if($users){
+			foreach($users as $user){
+				$adata = new stdClass();
+				$adata->user=$user;
+				$userpoints = majhub\point::from_userid($user->id);
+				$adata->points=$userpoints->total;	
+				$alldata[]= $adata;
+			}
+		}
+		//At this point we have an event object per question from the log to process.
+		//eg timetaken = $question->selectanswer - $question->endplayquestion;
+		$this->rawdata= $alldata;
+		return true;
+	}
+
+}
+
+/*
+* local_majhub_allusers_report 
+*
+*
+*/
+
+class local_majhub_points_report extends  local_majhub_base_report {
+	
+	protected $report="points";
+	protected $fields = array('fullname','registration','upload','review','popularity','quality','user','download','total');	
+	protected $headingdata = null;
+	protected $qcache=array();
+	protected $ucache=array();
+	
+	public function fetch_formatted_field($field,$record,$withlinks){
+				global $DB;
+			switch($field){
+			
+				case 'fullname':
+					$ret = fullname($record->u);
+					if($withlinks){
+						$ret = $this->truncate($ret,35);
+					}
+					break;
+
+				case 'download':
+					$ret = -1 * $record->download;
+					break;
+				default:
+					if(property_exists($record,$field)){
+						$ret=$record->{$field};
+					}else{
+						$ret = '';
+					}
+			}
+			return $ret;
+	}
+	
+	public function fetch_formatted_heading(){
+		return get_string('pointsreport','local_majhub');
+	}
+	
+	public function process_raw_data($formdata){
+		global $DB;
+
+		//no data in the heading, so an empty class even is overkill ..
+		$this->headingdata = new stdClass();
+		//get all the users in the db
+		$users = $DB->get_records('user',array('deleted'=>0));
+		
+		$alldata=array();
+		if($users){
+			foreach($users as $user){
+				$userpoints = majhub\point::from_userid($user->id);
+				$adata = new stdClass();
+				$adata->u=$user;
+				$adata->registration=$userpoints->total;
+				$adata->upload=$userpoints->upload;
+				$adata->review=$userpoints->review;
+				$adata->popularity=$userpoints->popularity;
+				$adata->quality=$userpoints->quality;
+				$adata->user=$userpoints->user;
+				$adata->download=$userpoints->download;
+				$adata->total=$userpoints->total;	
+				$alldata[]= $adata;
+			}
+		}
+		//At this point we have an event object per question from the log to process.
+		//eg timetaken = $question->selectanswer - $question->endplayquestion;
+		$this->rawdata= $alldata;
+		return true;
+	}
+}
+
+
+/*
+* local_majhub_allusers_report 
+*
+*
+*/
+
+class local_majhub_mailchimp_report extends  local_majhub_base_report {
+	
+	protected $report="mailchimp";
+	protected $fields = array('firstname','lastname','idnumber','username','language','email','majmember','points');	
 	protected $headingdata = null;
 	protected $qcache=array();
 	protected $ucache=array();
@@ -218,7 +385,7 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 	}
 	
 	public function fetch_formatted_heading(){
-		return get_string('allusersreport','local_majhub');
+		return get_string('mailchimpreport','local_majhub');
 	}
 	
 	public function process_raw_data($formdata){
@@ -236,86 +403,12 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 				$adata->user=$user;
 				$userpoints = majhub\point::from_userid($user->id);
 				$adata->points=$userpoints->total;	
-				$alldata[]= $adata;
-			}
-		}
-		//At this point we have an event object per question from the log to process.
-		//eg timetaken = $question->selectanswer - $question->endplayquestion;
-		$this->rawdata= $alldata;
-		return true;
-	}
-
-}
-
-/*
-* local_majhub_allusers_report 
-*
-*
-*/
-
-class local_majhub_points_report extends  local_majhub_base_report {
-	
-	protected $report="points";
-	protected $fields = array('fullname','username','registration','upload','review','popularity','quality','user','download','total');	
-	protected $headingdata = null;
-	protected $qcache=array();
-	protected $ucache=array();
-	
-	public function fetch_formatted_field($field,$record,$withlinks){
-				global $DB;
-			switch($field){
-			
-				case 'fullname':
-					$ret = fullname($record->u);
-					if($withlinks){
-						$ret = $this->truncate($ret,35);
-					}
-					break;
-				case 'username':
-					$ret = $record->u->username;
-					if($withlinks){
-						$ret = $this->truncate($ret,35);
-					}
-					break;
-				case 'download':
-					$ret = -1 * $record->download;
-					break;
-				default:
-					if(property_exists($record,$field)){
-						$ret=$record->{$field};
-					}else{
-						$ret = '';
-					}
-			}
-			return $ret;
-	}
-	
-	public function fetch_formatted_heading(){
-		return get_string('pointsreport','local_majhub');
-	}
-	
-	public function process_raw_data($formdata){
-		global $DB;
-
-		//no data in the heading, so an empty class even is overkill ..
-		$this->headingdata = new stdClass();
-		//get all the users in the db
-		$users = $DB->get_records('user',array('deleted'=>0));
-		
-		$alldata=array();
-		if($users){
-			foreach($users as $user){
-				$userpoints = majhub\point::from_userid($user->id);
-				$adata = new stdClass();
-				$adata->u=$user;
-				$adata->registration=$userpoints->total;
-				$adata->upload=$userpoints->upload;
-				$adata->review=$userpoints->review;
-				$adata->popularity=$userpoints->popularity;
-				$adata->quality=$userpoints->quality;
-				$adata->user=$userpoints->user;
-				$adata->download=$userpoints->download;
-				$adata->total=$userpoints->total;	
+				$profilefields = profile_user_record($user->id);
+				if(property_exists($profilefields,'majmember')){
+					$adata->majmember=$profilefields->majmember;
+				}else{
+					$adata->majmember=0;
+				}
 				$alldata[]= $adata;
 			}
 		}
