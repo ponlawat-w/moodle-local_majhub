@@ -169,7 +169,7 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 			switch($field){
 				
 				case 'fullname':
-					$ret = fullname($record->u);
+					$ret = fullname($record->user);
 					if($withlinks){
 						$ret = $this->truncate($ret,35);
 					}
