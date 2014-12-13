@@ -171,14 +171,14 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 				case 'fullname':
 					$ret = fullname($record->user);
 					if($withlinks){
-						$ret = $this->truncate($ret,35);
+						$ret = $this->truncate($ret,30);
 					}
 					break;
 
 				case 'username':
 					$ret = $record->user->username;
 					if($withlinks){
-						$ret = $this->truncate($ret,35);
+						$ret = $this->truncate($ret,30);
 					}
 					break;
 				case 'language':
@@ -187,7 +187,7 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 				case 'email':
 					$ret = $record->user->email;
 					if($withlinks){
-						$ret = $this->truncate($ret,30);
+						$ret = $this->truncate($ret,25);
 					}
 					break;
 				case 'points':
@@ -358,7 +358,7 @@ class local_majhub_mailchimp_report extends  local_majhub_base_report {
 				case 'username':
 					$ret = $record->user->username;
 					if($withlinks){
-						$ret = $this->truncate($ret,35);
+						$ret = $this->truncate($ret,30);
 					}
 					break;
 				case 'language':
@@ -367,8 +367,11 @@ class local_majhub_mailchimp_report extends  local_majhub_base_report {
 				case 'email':
 					$ret = $record->user->email;
 					if($withlinks){
-						$ret = $this->truncate($ret,30);
+						$ret = $this->truncate($ret,25);
 					}
+					break;
+				case 'majmember':
+						$ret = $record->majmember;
 					break;
 				case 'points':
 						$ret = $record->points;
@@ -405,9 +408,13 @@ class local_majhub_mailchimp_report extends  local_majhub_base_report {
 				$adata->points=$userpoints->total;	
 				$profilefields = profile_user_record($user->id);
 				if(property_exists($profilefields,'majmember')){
-					$adata->majmember=$profilefields->majmember;
+					if($profilefields->majmember){
+						$adata->majmember='yes';
+					}else{
+						$adata->majmember='no';
+					}
 				}else{
-					$adata->majmember=0;
+					$adata->majmember='no';
 				}
 				$alldata[]= $adata;
 			}
