@@ -164,3 +164,7 @@ $string['quality'] ='Qual.';
 $string['user'] ='User';
 $string['download'] ='Downld';
 $string['total'] ='Total';
+$string['firstname'] ='First Name';
+$string['lastname'] ='Last Name';
+$string['idnumber'] ='idnumber';
+$string['language'] ='Language';

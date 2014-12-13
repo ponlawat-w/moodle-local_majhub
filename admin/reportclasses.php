@@ -158,7 +158,7 @@ abstract class local_majhub_base_report {
 class local_majhub_allusers_report extends  local_majhub_base_report {
 	
 	protected $report="allusers";
-	protected $fields = array('fullname','username','email','lastaccess','points');	
+	protected $fields = array('firstname','lastname','idnumber','username','language','email','lastaccess','points');	
 	protected $headingdata = null;
 	protected $qcache=array();
 	protected $ucache=array();
@@ -173,17 +173,29 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 						$ret = get_string('neveraccessed', 'local_majhub');
 					}
 					break;
-				case 'fullname':
-					$ret = fullname($record->user);
+				case 'firstname':
+					$ret = $record->user->firstname;
 					if($withlinks){
 						$ret = $this->truncate($ret,35);
 					}
+					break;
+				case 'lastname':
+					$ret = $record->user->firstname;
+					if($withlinks){
+						$ret = $this->truncate($ret,35);
+					}
+					break;
+				case 'idnumber':
+					$ret = $record->user->id;
 					break;
 				case 'username':
 					$ret = $record->user->username;
 					if($withlinks){
 						$ret = $this->truncate($ret,35);
 					}
+					break;
+				case 'language':
+					$ret = $record->user->lang;
 					break;
 				case 'email':
 					$ret = $record->user->email;
