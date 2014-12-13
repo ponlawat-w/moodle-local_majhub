@@ -176,13 +176,13 @@ class local_majhub_allusers_report extends  local_majhub_base_report {
 				case 'firstname':
 					$ret = $record->user->firstname;
 					if($withlinks){
-						$ret = $this->truncate($ret,35);
+						$ret = $this->truncate($ret,25);
 					}
 					break;
 				case 'lastname':
-					$ret = $record->user->firstname;
+					$ret = $record->user->lastname;
 					if($withlinks){
-						$ret = $this->truncate($ret,35);
+						$ret = $this->truncate($ret,25);
 					}
 					break;
 				case 'idnumber':
