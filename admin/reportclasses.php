@@ -441,7 +441,7 @@ class local_majhub_mailchimp_report extends  local_majhub_base_report {
 						}
 					}
 					//if it is just bad because of crap spam blizzard annoyingness
-					$stubs = array('laposte.net','outlook.com');
+					$stubs = array('laposte.net','outlook.com','yahoo.com');
 					foreach ($stubs as $stub){
 						if(strpos($user->email,'@' . $stub)){
 							$itsbad = true;
