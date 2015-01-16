@@ -68,7 +68,11 @@ function leaderboard_print_list($title, array $coursewares)
     echo html_writer::start_tag('ol', array('style' => 'margin:0.5em 0 0 2em;'));
     foreach ($coursewares as $courseware) {
         $previewurl = new moodle_url('/course/view.php', array('id' => $courseware->courseid));
-        $item = html_writer::tag('span', $courseware->usefullname, array('style' => 'margin-right:0.5em;'))
+		$fullname = $courseware->usefullname;
+		if(strpos($fullname,'#')===0 && strlen($fullname)> 4){
+			$fullname = trim(substr($fullname,-1*(strlen($fullname) - 4)));
+		}
+        $item = html_writer::tag('span', $fullname, array('style' => 'margin-right:0.5em;'))
               . html_writer::link($previewurl, $previewicon);
         echo html_writer::tag('li', $item, array('style' => 'line-height:1.5em;'));
     }
