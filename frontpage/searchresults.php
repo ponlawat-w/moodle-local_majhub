@@ -34,7 +34,7 @@ if ($defaultlimit > 0) {
     $criteria = array();
     foreach ($keywords as $keyword) {
         $keywordcriteria = array(
-            criterion::text('cw.fullname', $keyword), criterion::text('cw.shortname', $keyword),
+            criterion::text('c.fullname', $keyword), criterion::text('c.shortname', $keyword),
             criterion::text('u.firstname', $keyword), criterion::text('u.lastname', $keyword),
             );
         foreach (metafield::all() as $metafield) {
@@ -45,7 +45,7 @@ if ($defaultlimit > 0) {
     }
     if (strlen($title) != 0) {
         $criteria[] = criterion::join('OR',
-            array(criterion::text('cw.fullname', $title), criterion::text('cw.shortname', $title))
+            array(criterion::text('c.fullname', $title), criterion::text('c.shortname', $title))
             );
     }
     if (strlen($contributor) != 0) {
@@ -80,7 +80,7 @@ if ($defaultlimit > 0) {
     }
     $criterion = criterion::join('AND', $criteria);
 
-    $sql = 'SELECT cw.id, cw.fullname, cw.courseid, cw.demourl, cw.backuprelease, cw.backupversion, cw.unrestorable, 
+    $sql = 'SELECT cw.id, c.fullname, cw.courseid, cw.demourl, cw.backuprelease, cw.backupversion, cw.unrestorable, 
 			cw.timeuploaded, u.firstname, u.lastname,
                    (SELECT AVG(r.rating) FROM {majhub_courseware_reviews} r WHERE r.coursewareid = cw.id) AS rating,
                    (SELECT COUNT(*) FROM {majhub_courseware_reviews} r WHERE r.coursewareid = cw.id) AS num_reviews
@@ -92,7 +92,7 @@ if ($defaultlimit > 0) {
                          ON m{$metafield->id}.coursewareid = cw.id AND m{$metafield->id}.metafieldid = $metafield->id";
     }
     $sql .= ' WHERE cw.deleted = 0 AND ' . $criterion->expression;
-    $sql .= ' GROUP BY cw.id, cw.fullname, cw.courseid, cw.demourl, cw.timeuploaded, u.firstname, u.lastname';
+    $sql .= ' GROUP BY cw.id, c.fullname, cw.courseid, cw.demourl, cw.timeuploaded, u.firstname, u.lastname';
     $orderby = 'timeuploaded DESC';
     switch ($sortby) {
     case 'newest': $orderby = 'timeuploaded DESC'; break;
