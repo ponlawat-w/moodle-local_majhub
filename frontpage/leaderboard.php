@@ -82,9 +82,9 @@ function leaderboard_print_list($title, array $coursewares)
 <col width="25%" />
 <col width="25%" />
 <tr>
-  <td><?php leaderboard_print_list(get_string('mostdownloaded', 'local_majhub'), $mostdownloadedcoursewares); ?></td>
-  <td><?php leaderboard_print_list(get_string('toprated', 'local_majhub'), $topratedcoursewares); ?></td>
-  <td><?php leaderboard_print_list(get_string('mostreviewed', 'local_majhub'), $mostreviewedcoursewares); ?></td>
-  <td><?php leaderboard_print_list(get_string('latest', 'local_majhub'), $latestcoursewares); ?></td>
+  <td class="leaderboard"><?php leaderboard_print_list(get_string('mostdownloaded', 'local_majhub'), $mostdownloadedcoursewares); ?></td>
+  <td class="leaderboard"><?php leaderboard_print_list(get_string('toprated', 'local_majhub'), $topratedcoursewares); ?></td>
+  <td class="leaderboard"><?php leaderboard_print_list(get_string('mostreviewed', 'local_majhub'), $mostreviewedcoursewares); ?></td>
+  <td class="leaderboard"><?php leaderboard_print_list(get_string('latest', 'local_majhub'), $latestcoursewares); ?></td>
 </tr>
 </table>

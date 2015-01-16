@@ -12,3 +12,7 @@ div.local_majhub_actionbuttons {
 	display: flex;
 	float: right;
 }
+
+td.leaderboard {
+	vertical-align: top;
+}
