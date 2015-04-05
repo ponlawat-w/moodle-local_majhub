@@ -67,6 +67,10 @@ switch ($showreport){
 		$report = new local_majhub_mailchimp_report();
 		$formdata = new stdClass();
 		break;	
+	case 'unrestored':
+		$report = new local_majhub_unrestored_report();
+		$formdata = new stdClass();
+		break;	
 	case 'menu':
 	default:
 		echo $reportrenderer->header();

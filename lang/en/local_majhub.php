@@ -171,3 +171,14 @@ $string['language'] ='language';
 $string['majmember'] ='majmember';
 $string['mailchimp'] ='mailchimp';
 $string['mailchimpreport'] ='Mailchimp Import Report';
+
+$string['fullname'] ='Full Name';
+$string['id'] ='ID';
+$string['startdate'] ='Restore Start';
+$string['uploaddate'] ='Upload Date';
+$string['action'] ='Action';
+$string['unrestored'] ='Unrestored';
+$string['resetrestore'] ='Reset Restore';
+$string['unrestoredreport'] ='Unrestored Report';
+$string['neverstarted'] ='never';
+$string['coursewareupdated'] ='Courseware Updated Successfully';

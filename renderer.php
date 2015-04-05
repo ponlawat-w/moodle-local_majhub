@@ -39,8 +39,11 @@ class local_majhub_report_renderer extends plugin_renderer_base {
 		$mailchimp = new single_button(
 			new moodle_url('/local/majhub/admin/reports.php',array('report'=>'mailchimp')), 
 			get_string('mailchimpreport','local_majhub'), 'get');
+		$unrestored	= new single_button(
+			new moodle_url('/local/majhub/admin/reports.php',array('report'=>'unrestored')), 
+			get_string('unrestoredreport','local_majhub'), 'get');
 			
-		$ret = html_writer::div($this->render($allusers) .'<br />' . $this->render($points) .'<br />' . $this->render($mailchimp) ,'local_majhub_listbuttons');
+		$ret = html_writer::div($this->render($allusers) .'<br />' . $this->render($points) .'<br />' . $this->render($mailchimp) .'<br />' . $this->render($unrestored) ,'local_majhub_listbuttons');
 
 		return $ret;
 	}
