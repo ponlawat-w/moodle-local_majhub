@@ -8,7 +8,7 @@ defined('MOODLE_INTERNAL') || die;
  *  
  *  @global moodle_database $DB
  */
-function local_majhub_cron()
+function local_majhub_cron(progress_trace $trace = null)
 {
     global $DB;
 
@@ -19,11 +19,24 @@ function local_majhub_cron()
     $teacherrole = $DB->get_record('role', array('archetype' => 'teacher'), '*', IGNORE_MULTIPLE);
     $editingteacherrole = $DB->get_record('role', array('archetype' => 'editingteacher'), '*', IGNORE_MULTIPLE);
     $enroller = enrol_get_plugin('manual');
+	if($trace){
+	 $trace->output("Executing MAJ HUB cron");
+	}
 
     // gets all uploaded, not restored and not restoring coursewares
     $coursewares = $DB->get_records_select(majhub\courseware::TABLE,
         'deleted = 0 AND fileid IS NOT NULL AND courseid IS NULL AND timestarted IS NULL',
         null, 'timeuploaded ASC');
+
+    if($coursewares){
+   	 if($trace){
+    	$trace->output("found courses to restore");
+      }
+    }else{
+    	if($trace){
+    		$trace->output("found no courses to restore. Exiting");	
+    	}
+    }
 
     foreach ($coursewares as $courseware) try {
 	    // double check to prevent from being duplicated
@@ -34,12 +47,12 @@ function local_majhub_cron()
 			
         // marks as restoring
         $DB->set_field(majhub\courseware::TABLE, 'timestarted', time(), array('id' => $courseware->id));
-
-        mtrace("  Courseware ID: {$courseware->id}");
-
-        mtrace('    Creating a preview course', '...');
-        {
-
+		
+		if($trace){
+        	$trace->output("  Courseware ID: {$courseware->id}");
+        	$trace->output('    Creating a preview course', '...');
+        }
+ 
             // restores the uploaded course backup file as a new course
 			$courseid = majhub\restore($courseware->id);
 			
@@ -68,11 +81,12 @@ function local_majhub_cron()
             $page->blocks->load_blocks();
             $page->blocks->add_block_at_end_of_default_region('majhub');
             $page->blocks->add_block('majhub_points', BLOCK_POS_LEFT, -1, false);
-        }
-        mtrace("done. (courseid: {$courseware->courseid})");
-
-        mtrace('    Assigning a teacher capability for all registered users', '...');
-        {
+            
+		if($trace){
+			$trace->output("done. (courseid: {$courseware->courseid})");
+			$trace->output('    Assigning a teacher capability for all registered users');
+		}
+		
             // assigns a capability for switching roles to non-editing teachers
             $context = context_course::instance($course->id);
             assign_capability('moodle/role:switchroles', CAP_ALLOW, $teacherrole->id, $context->id);
@@ -94,8 +108,10 @@ function local_majhub_cron()
                 }
             }
             unset($users); // for memory saving
+            
+        if($trace){
+        	$trace->output('done.');
         }
-        mtrace('done.');
 
         //Add Justin 20131020
         //make sure the course appears as ready and published. Set privacy to 1 to make it visible.

@@ -2,11 +2,10 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2014111800;
-$plugin->release   = '2.5, release 6';
+$plugin->version   = 2015040600;
+$plugin->release   = '2.6, release 1';
 $plugin->requires  = 2012062500.00; // Moodle 2.3.0
 $plugin->component = 'local_majhub';
-$plugin->cron      = 1;
 
 $plugin->dependencies = array(
     'block_majhub'        => 2013020700,

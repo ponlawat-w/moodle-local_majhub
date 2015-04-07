@@ -182,3 +182,4 @@ $string['resetrestore'] ='Reset Restore';
 $string['unrestoredreport'] ='Unrestored Report';
 $string['neverstarted'] ='never';
 $string['coursewareupdated'] ='Courseware Updated Successfully';
+$string['crontask'] ='Cron Task';
