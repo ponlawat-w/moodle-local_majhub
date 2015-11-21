@@ -71,6 +71,10 @@ switch ($showreport){
 		$report = new local_majhub_unrestored_report();
 		$formdata = new stdClass();
 		break;	
+	case 'coursewares':
+		$report = new local_majhub_coursewares_report();
+		$formdata = new stdClass();
+		break;
 	case 'menu':
 	default:
 		echo $reportrenderer->header();

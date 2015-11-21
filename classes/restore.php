@@ -24,6 +24,7 @@ function restore($coursewareid)
     global $CFG, $DB;
 
     require_once __DIR__.'/../../../backup/util/includes/restore_includes.php';
+    require $CFG->libdir . '/filestorage/tgz_packer.php';
 
     // checks if the courseware exists and is not restored yet
     $courseware = $DB->get_record('majhub_coursewares', array('id' => $coursewareid), '*', MUST_EXIST);
@@ -42,7 +43,8 @@ function restore($coursewareid)
     });
 
     // prepares the restore working directory
-    $workdir = $CFG->dataroot . '/temp/backup';
+    $workdir = $CFG->tempdir . '/backup';
+
     if (!\check_dir_exists($workdir, true, true))
         throw new \moodle_exception('error_creating_temp_dir', 'error', $workdir);
 
@@ -51,12 +53,17 @@ function restore($coursewareid)
     // copies the backup archive into the working directory
     $tempzip = \restore_controller::get_tempdir_name();
     $file = $fs->get_file_by_id($courseware->fileid);
-    $file->copy_content_to("$workdir/$tempzip");
+    $couldcopy =  $file->copy_content_to("$workdir/$tempzip");
     $tempfiles[] = "$workdir/$tempzip";
-	
+
 
     // extracts the archive in the working directory
-    $packer = new \zip_packer();
+    //from M2.8 ? tgz file format becamse the default.
+    if(\tgz_packer::is_tgz_file($file)){
+    	$packer = new \tgz_packer();
+    }else{
+    	$packer = new \zip_packer();
+    }
     $packer->extract_to_pathname("$workdir/$tempzip", "$workdir/$tempdir");
     $tempfiles[] = "$workdir/$tempdir";
 
@@ -100,20 +107,24 @@ function restore($coursewareid)
 		$DB->update_record('majhub_coursewares', $courseware);
 		return false;
 	}
-
     // restores the backup as a new course in the fist top-level category
     $categories = $DB->get_records('course_categories', array('parent' => 0), 'id ASC', '*', 0, 1);
     $category = reset($categories);
     $fullname = sprintf('#%d. %s', $courseware->id, $courseware->fullname);
     $shortname = sprintf('#%d. %s', $courseware->id, $courseware->shortname);
     $courseid = \restore_dbops::create_new_course($fullname, $shortname, $category->id);
+
+try{
     $rc = new \restore_controller($tempdir, $courseid,
         \backup::INTERACTIVE_NO, \backup::MODE_HUB, $admin->id, \backup::TARGET_NEW_COURSE);
     // TODO: detect if the course requires non-standard plugins
     $rc->set_status(\backup::STATUS_AWAITING);
+    }catch(Exception $e){
+    	mtrace("MAJHUB Exception raised: " . $e->getMessage() . "\n");
+    	return false;
+    }
     $rc->execute_plan();
     $rc->destroy();
-
     unset($scope);
 
     // updates the courseware record

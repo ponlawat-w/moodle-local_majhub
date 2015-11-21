@@ -473,7 +473,7 @@ class local_majhub_mailchimp_report extends  local_majhub_base_report {
 }
 
 /*
-* local_majhub_allusers_report 
+* local_majhub_unrestored_report 
 *
 *
 */
@@ -552,3 +552,74 @@ class local_majhub_unrestored_report extends  local_majhub_base_report {
 	}
 }
 
+/*
+* local_majhub_coursewares_report 
+*
+*
+*/
+
+class local_majhub_coursewares_report extends  local_majhub_base_report {
+	
+	
+	protected $report="unrestored";
+	protected $fields = array('id','fullname','filesize','fileid','backuprelease','backupversion','unrestorable','courseid','hubcourseid','sitecourseid','startdate','uploaddate');	
+	protected $headingdata = null;
+	protected $qcache=array();
+	protected $ucache=array();
+	
+	public function fetch_formatted_field($field,$record,$withlinks){
+				global $DB;
+			switch($field){
+			
+				case 'fullname':
+					$ret = $record->fullname;
+					break;
+
+				case 'id':
+					$ret = $record->id;
+					break;
+				case 'startdate':
+					if($record->timestarted){
+						$ret = date("Y-m-d",$record->timestarted);
+					}else{
+						$ret = get_string('neverstarted','local_majhub');
+					}
+					break;
+				case 'uploaddate':
+					$ret = date("Y-m-d",$record->timeuploaded);
+					break;
+				default:
+					if(property_exists($record,$field)){
+						$ret=$record->{$field};
+					}else{
+						$ret = '';
+					}
+			}
+			return $ret;
+	}
+	
+	public function fetch_formatted_heading(){
+		return get_string('unrestored','local_majhub');
+	}
+	
+	public function process_raw_data($formdata){
+		global $DB;
+
+		//no data in the heading, so an empty class even is overkill ..
+		$this->headingdata = new stdClass();
+		//get all the users in the db
+		$unrestoredcourses = $DB->get_records('majhub_coursewares',array());
+
+		
+		$alldata=array();
+		if($unrestoredcourses){
+			foreach($unrestoredcourses as $thecourse){	
+				$alldata[]= $thecourse;
+			}
+		}
+		//At this point we have an event object per question from the log to process.
+		//eg timetaken = $question->selectanswer - $question->endplayquestion;
+		$this->rawdata= $alldata;
+		return true;
+	}
+}

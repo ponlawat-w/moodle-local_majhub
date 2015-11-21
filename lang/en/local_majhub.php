@@ -180,6 +180,14 @@ $string['action'] ='Action';
 $string['unrestored'] ='Unrestored';
 $string['resetrestore'] ='Reset Restore';
 $string['unrestoredreport'] ='Unrestored Report';
+$string['coursewaresreport'] ='Coursewares Report';
 $string['neverstarted'] ='never';
 $string['coursewareupdated'] ='Courseware Updated Successfully';
+$string['backupversion'] ='Backup Version';
+$string['backuprelease'] ='Release';
 $string['crontask'] ='Cron Task';
+$string['courseid'] ='CourseId';
+$string['hubcourseid'] ='Hub Course Id';
+
+
+

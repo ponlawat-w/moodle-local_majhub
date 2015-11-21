@@ -42,8 +42,14 @@ class local_majhub_report_renderer extends plugin_renderer_base {
 		$unrestored	= new single_button(
 			new moodle_url('/local/majhub/admin/reports.php',array('report'=>'unrestored')), 
 			get_string('unrestoredreport','local_majhub'), 'get');
+		$coursewares	= new single_button(
+			new moodle_url('/local/majhub/admin/reports.php',array('report'=>'coursewares')), 
+			get_string('coursewaresreport','local_majhub'), 'get');
 			
-		$ret = html_writer::div($this->render($allusers) .'<br />' . $this->render($points) .'<br />' . $this->render($mailchimp) .'<br />' . $this->render($unrestored) ,'local_majhub_listbuttons');
+		$ret = html_writer::div($this->render($allusers) .'<br />' . $this->render($points) .'<br />' . 
+					$this->render($mailchimp) .'<br />' . 
+					$this->render($coursewares) .'<br />' . 
+					$this->render($unrestored) ,'local_majhub_listbuttons');
 
 		return $ret;
 	}
