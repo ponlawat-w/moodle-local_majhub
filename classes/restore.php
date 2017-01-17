@@ -110,8 +110,8 @@ function restore($coursewareid)
     // restores the backup as a new course in the fist top-level category
     $categories = $DB->get_records('course_categories', array('parent' => 0), 'id ASC', '*', 0, 1);
     $category = reset($categories);
-    $fullname = sprintf('#%d. %s', $courseware->id, $courseware->fullname);
-    $shortname = sprintf('#%d. %s', $courseware->id, $courseware->shortname);
+    $fullname = $courseware->id . ': ' . $courseware->fullname;
+    $shortname = $courseware->id . ': ' . $courseware->shortname;
     $courseid = \restore_dbops::create_new_course($fullname, $shortname, $category->id);
 
 try{

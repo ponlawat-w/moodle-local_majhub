@@ -8,8 +8,10 @@ if (false) {
 }
 
 $ADMIN->add('root', new admin_category('majhub', new lang_string('pluginname', 'local_majhub')));
-if (empty($CFG->customfrontpageinclude) || realpath($CFG->customfrontpageinclude) !== realpath(__DIR__.'/frontpage.php') ||
-    empty($CFG->customscripts)          || realpath($CFG->customscripts)          !== realpath(__DIR__.'/customscripts')) {
+//removed need for frontpage to be custom. Justin 20160707
+//if (empty($CFG->customfrontpageinclude) || realpath($CFG->customfrontpageinclude) !== realpath(__DIR__.'/frontpage.php') ||
+//    empty($CFG->customscripts)          || realpath($CFG->customscripts)          !== realpath(__DIR__.'/customscripts')) {
+if (empty($CFG->customscripts)          || realpath($CFG->customscripts)          !== realpath(__DIR__.'/customscripts')) {
     // MAJ Hub requires special configuration for custom frontpage
     $ADMIN->add('majhub', new admin_externalpage('majhub/install',
         'INSTALL', new moodle_url('/local/majhub/INSTALL.txt')));
