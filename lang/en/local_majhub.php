@@ -58,7 +58,7 @@ $string['howtogetpoints.desc'] = '<ul>
 $string['review'] = 'Review';
 $string['rating'] = 'Rating';
 $string['moderator'] = 'Moderator';
-$string['overallrating'] = 'Overall';
+$string['overallrating'] = 'Overall Ratings';
 $string['latestreviews'] = 'Latest {$a->latest} of {$a->total} reviews';
 $string['reviewinletters'] = 'Review in {$a} letters or more to get points';
 
@@ -189,5 +189,10 @@ $string['crontask'] ='Cron Task';
 $string['courseid'] ='CourseId';
 $string['hubcourseid'] ='Hub Course Id';
 
-
-
+$string['postreview'] = 'Write review to course: {$a}';
+$string['pointsawarded'] = 'Thank you for your review! {$a->point} points awarded for your contribution over {$a->minlength} characters.';
+$string['reviewfinished'] = 'Thank you for your review.';
+$string['reviewlengthunderminimum'] = 'Thank you for your review. <strong>Please write over {$a->minlength} characters</strong>. (You have written {$a->commentlength} characters)';
+$string['addmorecharacter'] = 'Add more or edit';
+$string['finishreviewing'] = 'Finished for now';
+$string['noratings'] = 'Error: Please rate from 1 to 5.';

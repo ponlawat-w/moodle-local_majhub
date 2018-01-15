@@ -62,7 +62,13 @@ class point
                 );
             return $this->_cache[$name] = self::get_settings()->pointsforuploading * $uploadingcount;
         case 'review':
-            $reviewingcount = $DB->count_records(review::TABLE, array('userid' => $this->userid));
+            $reviewingcount = 0;
+            $reviews = $DB->get_records('majhub_courseware_reviews', array('userid' => $this->userid));
+            foreach ($reviews as $review) {
+                if (mb_strlen($review->comment) > self::get_settings()->lengthforreviewing) {
+                   $reviewingcount++;
+                }
+            }
             return $this->_cache[$name] = self::get_settings()->pointsforreviewing * $reviewingcount;
         case 'popularity':
             $popularcoursewares = $DB->get_records_sql(
